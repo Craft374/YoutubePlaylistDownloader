@@ -77,9 +77,10 @@ public sealed partial class SettingsPage : UserControl
             SettingsRow(L.T("yt-dlp"), updateStatus, Ui.Row(8, updateProgress, update)),
             SettingsRow(L.T("Keep yt-dlp up to date automatically"), null, autoUpdate),
             SettingsRow(L.T("Data folder"), dataDescription, dataFolder));
-        stack.MaxWidth = 1000;
         stack.Padding = new Thickness(0, 0, 0, 24);
-        Content = new ScrollViewer { Content = stack, Padding = new Thickness(24, 0, 24, 0) };
+        var scroll = Ui.CenteredScroll(stack, 1000);
+        scroll.Padding = new Thickness(24, 0, 24, 0);
+        Content = scroll;
 
         appearance.SelectionChanged += (_, _) => { if (!updating) settings.Appearance = (Appearance)appearance.SelectedIndex; };
         language.SelectionChanged += (_, _) => { if (!updating) settings.Language = (AppLanguage)language.SelectedIndex; };

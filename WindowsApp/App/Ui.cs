@@ -147,6 +147,22 @@ public static class Ui
         return column;
     }
 
+    /// <summary>
+    /// 폭을 maxWidth 이하로 가운데 두고 세로로 스크롤합니다. ScrollViewer 안의 내용에 MaxWidth를 주면
+    /// 그려진 폭이 아니라 글자 폭 기준으로 가운데를 잡아 오른쪽으로 밀리므로(창보다 넓어져 잘림), 가운데 열의 MaxWidth로 제한합니다.
+    /// </summary>
+    public static ScrollViewer CenteredScroll(FrameworkElement content, double maxWidth)
+    {
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        // 가운데 열이 남는 폭을 거의 다 가져가되 maxWidth에서 멈추고, 나머지는 양옆이 반씩 나눕니다.
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1000, GridUnitType.Star), MaxWidth = maxWidth });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        Grid.SetColumn(content, 1);
+        grid.Children.Add(content);
+        return new ScrollViewer { Content = grid };
+    }
+
     public static Visibility Visible(bool visible) => visible ? Visibility.Visible : Visibility.Collapsed;
 
     /// <summary>

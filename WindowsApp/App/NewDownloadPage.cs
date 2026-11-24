@@ -87,9 +87,8 @@ public sealed partial class NewDownloadPage : UserControl
         subtitle.TextAlignment = TextAlignment.Center;
         var stack = Ui.Column(Design.Spacing * 2, subtitle, field,
                               Ui.Column(Design.Spacing, invalid, added, banner, resolving, failBar, result));
-        stack.MaxWidth = Design.ContentWidth;
         stack.Padding = new Thickness(24, 24, 24, 24);
-        Content = new ScrollViewer { Content = stack };
+        Content = Ui.CenteredScroll(stack, Design.ContentWidth);
 
         // 화면을 바꿔 끼울 때마다 Loaded가 다시 오므로(두 번 올 때도 있음) 먼저 빼고 다시 붙입니다.
         Loaded += (_, _) =>

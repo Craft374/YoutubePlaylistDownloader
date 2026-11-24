@@ -114,9 +114,8 @@ public sealed partial class BulkDownloadPage : UserControl
         subtitle.TextAlignment = TextAlignment.Center;
         var stack = Ui.Column(Design.Spacing * 2, subtitle, Ui.Column(Design.Spacing, editor, countRow),
                               progressCard, addedRow, failureCard);
-        stack.MaxWidth = Design.ContentWidth;
         stack.Padding = new Thickness(24, 24, 24, 24);
-        Content = new ScrollViewer { Content = stack };
+        Content = Ui.CenteredScroll(stack, Design.ContentWidth);
 
         Loaded += (_, _) =>
         {
