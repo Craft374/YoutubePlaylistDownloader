@@ -24,6 +24,8 @@ jobs:
         if: matrix.rid == 'win-x64'
       # 게시할 때 yt-dlp·ffmpeg·ffprobe·deno를 받아 tools\에 넣습니다(App.csproj의 BundleTools).
       - run: dotnet publish WindowsApp/App/App.csproj -c Release -r ${{ matrix.rid }} -o out/YoutubePlaylistDownloader
+      # PRI가 빠지면 앱이 시작하자마자 꺼지므로 확인합니다.
+      - run: if (!(Test-Path out/YoutubePlaylistDownloader/YoutubePlaylistDownloader.pri)) { throw 'YoutubePlaylistDownloader.pri is missing from the publish folder' }
       - uses: actions/upload-artifact@v4
         with:
           name: YoutubePlaylistDownloader-${{ matrix.rid }}

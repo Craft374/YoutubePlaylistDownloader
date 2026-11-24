@@ -37,6 +37,14 @@
     <Content Include="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- 빌드가 만든 리소스 색인(YoutubePlaylistDownloader.pri, WinUI 테마 리소스가 합쳐져 있음)을 게시 폴더에 넣습니다.
+       .NET SDK는 PRI를 게시하지 않고, 이를 넣어 주는 Windows SDK 대상은 EnableMsixTooling일 때만 들어옵니다. 없으면 시작하자마자 themeresources.xaml을 못 찾고 꺼집니다. -->
+  <Target Name="PublishProjectPri" AfterTargets="ComputeResolvedFilesToPublishList" Condition="'$(EnableCoreMrtTooling)' != 'false'">
+    <ItemGroup>
+      <ResolvedFileToPublish Include="$(ProjectPriFullPath)" RelativePath="$(ProjectPriFileName)" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
   <!-- 게시(publish)할 때 yt-dlp·ffmpeg·ffprobe·deno를 받아 tools\에 넣습니다. ToolManager가 찾는 배치와 같습니다.
        받은 파일은 tools-cache\<RID>\에 두고 다시 씁니다(새로 받으려면 그 폴더를 지웁니다). 끄려면 -p:BundleTools=false. -->
   <Target Name="BundleTools" AfterTargets="Publish" Condition="'$(BundleTools)' != 'false'">
