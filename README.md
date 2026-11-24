@@ -83,6 +83,10 @@ dotnet publish WindowsApp/App/App.csproj -c Release -r win-x64 -o out/YoutubePla
 - 게시할 때 yt-dlp, ffmpeg, ffprobe, deno를 받아 `tools\`에 함께 넣습니다. 받은 파일은 `WindowsApp/App/tools-cache`에 저장해 다음 빌드에 다시 씁니다.
   도구를 새로 받으려면 이 폴더를 지웁니다. 도구 없이 게시하려면 `-p:BundleTools=false`를 붙입니다.
 - Arm64용은 `-r win-arm64`로 게시합니다.
+- Mac의 Parallels Windows VM에 바로 빌드하려면 Mac에서 `WindowsApp/scripts/build-parallels.sh`를 실행합니다.
+  VM 안에 .NET 10 SDK를 따로 받아(`%LOCALAPPDATA%\YPDBuild`, 시스템 설치 아님) VM의 `%USERPROFILE%\YoutubePlaylistDownloader`에 빌드하고 시작 메뉴 바로 가기를 만듭니다.
+  다시 실행하면 그 폴더를 덮어쓰며 `data`(설정)는 남습니다. VM이 켜져 있어야 하고, 앱은 꺼져 있어야 합니다.
+  이 빌드는 VM 안의 `%LOCALAPPDATA%\YPDBuild\src\App\tools-cache`를 따로 쓰므로, 도구를 새로 받으려면 VM에서 그 폴더를 지웁니다.
 - 로직 테스트는 `dotnet test WindowsApp/Core.Tests`로 실행합니다(macOS에서도 됩니다).
 - macOS에서도 `dotnet build`·`dotnet publish`로 컴파일은 확인할 수 있지만, 실행할 수 있는 앱은 Windows(또는 GitHub Actions)에서 빌드해야 합니다.
 
