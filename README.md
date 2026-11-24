@@ -60,7 +60,7 @@ open "build/YouTube Playlist Downloader.app"
 
 ## Windows
 
-Windows 10 1809 이상 또는 Windows 11에서 실행됩니다. 기본은 x64이고, Arm64용으로도 빌드할 수 있습니다.
+Windows 10 1809 이상 또는 Windows 11에서 실행됩니다. x64와 Arm64(Snapdragon PC, Mac의 Parallels 등)용이 따로 있습니다.
 .NET이나 Windows App SDK를 따로 설치할 필요가 없습니다(실행 파일 폴더에 함께 들어 있습니다).
 
 ### 받기
@@ -68,7 +68,7 @@ Windows 10 1809 이상 또는 Windows 11에서 실행됩니다. 기본은 x64이
 Windows에서 직접 빌드하지 않아도 GitHub Actions가 빌드한 결과물을 받을 수 있습니다.
 
 1. 저장소의 **Actions** → **Windows** 워크플로를 엽니다. `master`에 `WindowsApp/`이 바뀐 커밋을 푸시하면 자동으로 실행되고, **Run workflow**로 직접 실행할 수도 있습니다.
-2. 끝난 실행 페이지 아래 **Artifacts**에서 `YoutubePlaylistDownloader-win-x64`를 받아 압축을 풉니다.
+2. 끝난 실행 페이지 아래 **Artifacts**에서 `YoutubePlaylistDownloader-win-x64`(ARM PC는 `-win-arm64`)를 받아 압축을 풉니다.
 3. `YoutubePlaylistDownloader\YoutubePlaylistDownloader.exe`를 실행합니다. 폴더째로 원하는 곳에 두면 됩니다(설치 과정 없음).
 
 ### 빌드
