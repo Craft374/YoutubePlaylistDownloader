@@ -24,7 +24,7 @@ public sealed partial class OptionsPanel : UserControl
     private readonly TextBlock modeDescription = Ui.Caption();
     // 동영상·오디오(모드에 따라 보이는 것만 다름. 요소는 부모가 하나뿐이라 한 목록에 두고 숨깁니다.)
     private readonly TextBlock mediaHeader = Ui.SectionHeader("");
-    private readonly ComboBox container = Combo(L.T("Container"), ["MP4", "MKV"]);
+    private readonly ComboBox container = Combo(L.T("Container"), new[] { "MP4", "MKV" });
     private readonly ComboBox maxHeight = Combo(L.T("Max resolution"), Resolution.Heights.Select(HeightLabel));
     private readonly CheckBox preferFPS = Check(L.T("Prefer higher frame rate"));
     private readonly CheckBox subtitles = Check(L.T("Download subtitles"));
@@ -49,7 +49,7 @@ public sealed partial class OptionsPanel : UserControl
     private readonly StackPanel rangeRow;
     private readonly TextBlock rangeFooter = Ui.Caption(L.T("Leave To at 0 to download until the end"));
     private readonly CheckBox filterByLength = Check(L.T("Only download videos by length"));
-    private readonly ComboBox filterLonger = Combo(null, [L.T("Longer than"), L.T("Shorter than")]);
+    private readonly ComboBox filterLonger = Combo(null, new[] { L.T("Longer than"), L.T("Shorter than") });
     private readonly NumberBox filterMinutes = Number(null, 0);
     private readonly StackPanel lengthRow;
 
