@@ -1,0 +1,96 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- WinUI 3 앱(패키지 없음). XAML 파일 없이 C# 코드로만 화면을 만듭니다(macOS에서는 XAML 컴파일러가 돌지 않음). -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <AssemblyName>YoutubePlaylistDownloader</AssemblyName>
+    <RootNamespace>YPD.App</RootNamespace>
+    <UseWinUI>true</UseWinUI>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Main은 Program.cs에 직접 둡니다. -->
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+  </PropertyGroup>
+
+  <!-- macOS에서는 makepri.exe·mt.exe가 돌지 않아 PRI 단계와 런타임 동봉(매니페스트 병합)을 끕니다(컴파일 확인용). Windows 빌드는 그대로입니다. -->
+  <PropertyGroup Condition="'$([MSBuild]::IsOSPlatform(Windows))' != 'true'">
+    <EnableCoreMrtTooling>false</EnableCoreMrtTooling>
+    <WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.7.0" />
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 창 아이콘(MainWindow가 실행 파일 옆 Assets\AppIcon.ico를 읽음). -->
+    <Content Include="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- 게시(publish)할 때 yt-dlp·ffmpeg·ffprobe·deno를 받아 tools\에 넣습니다. ToolManager가 찾는 배치와 같습니다.
+       받은 파일은 tools-cache\<RID>\에 두고 다시 씁니다(새로 받으려면 그 폴더를 지웁니다). 끄려면 -p:BundleTools=false. -->
+  <Target Name="BundleTools" AfterTargets="Publish" Condition="'$(BundleTools)' != 'false'">
+    <PropertyGroup>
+      <ToolsCache>$(MSBuildProjectDirectory)/tools-cache/$(RuntimeIdentifier)/</ToolsCache>
+      <ToolsDir>$(PublishDir)tools/</ToolsDir>
+      <YtdlpTagFile>$(ToolsCache)yt-dlp.VERSION</YtdlpTagFile>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+      <YtdlpAsset>yt-dlp_win.zip</YtdlpAsset>
+      <FFmpegAsset>ffmpeg-master-latest-win64-gpl</FFmpegAsset>
+      <DenoAsset>deno-x86_64-pc-windows-msvc.zip</DenoAsset>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-arm64'">
+      <YtdlpAsset>yt-dlp_win_arm64.zip</YtdlpAsset>
+      <YtdlpZipExe>yt-dlp_arm64.exe</YtdlpZipExe>
+      <FFmpegAsset>ffmpeg-master-latest-winarm64-gpl</FFmpegAsset>
+      <DenoAsset>deno-aarch64-pc-windows-msvc.zip</DenoAsset>
+    </PropertyGroup>
+    <Error Condition="'$(YtdlpAsset)' == ''" Text="BundleTools는 win-x64와 win-arm64만 지원합니다(지금: '$(RuntimeIdentifier)'). 도구 없이 게시하려면 -p:BundleTools=false를 붙이십시오." />
+
+    <!-- yt-dlp 태그는 VERSION 파일에 그대로 들어가 앱이 업데이트한 버전과 비교하므로, 받은 zip과 반드시 같아야 합니다.
+         releases/latest 페이지(태그 페이지로 리디렉션)의 og:url에서 읽습니다. GitHub API는 User-Agent가 없으면 403이고 CI에서는 호출 한도에도 걸립니다. -->
+    <PropertyGroup Condition="Exists('$(YtdlpTagFile)')">
+      <YtdlpTag>$([System.IO.File]::ReadAllText('$(YtdlpTagFile)').Trim())</YtdlpTag>
+    </PropertyGroup>
+    <DownloadFile Condition="'$(YtdlpTag)' == ''" SourceUrl="https://github.com/yt-dlp/yt-dlp/releases/latest" DestinationFolder="$(ToolsCache)" DestinationFileName="yt-dlp-latest.html" Retries="3" />
+    <PropertyGroup Condition="'$(YtdlpTag)' == ''">
+      <YtdlpTag>$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(ToolsCache)yt-dlp-latest.html')), 'property="og:url" content="[^"]*/yt-dlp/yt-dlp/releases/tag/([0-9][0-9.]*)"').Groups[1].Value)</YtdlpTag>
+    </PropertyGroup>
+    <Delete Files="$(ToolsCache)yt-dlp-latest.html" />
+    <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(YtdlpTag)', '^[0-9]+(\.[0-9]+)+$'))" Text="yt-dlp 최신 릴리스 태그를 읽지 못했습니다('$(YtdlpTag)'). GitHub 페이지 형식이 바뀌었을 수 있습니다. $(ToolsCache) 폴더를 지우고 다시 시도하거나 -p:BundleTools=false로 게시하십시오." />
+    <WriteLinesToFile File="$(YtdlpTagFile)" Lines="$(YtdlpTag)" Overwrite="true" />
+
+    <!-- 받다 끊긴 파일이 캐시로 남지 않게 .part로 받은 뒤 옮깁니다. -->
+    <ItemGroup>
+      <ToolZip Include="yt-dlp-$(YtdlpTag).zip" Url="https://github.com/yt-dlp/yt-dlp/releases/download/$(YtdlpTag)/$(YtdlpAsset)" />
+      <ToolZip Include="$(FFmpegAsset).zip" Url="https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/$(FFmpegAsset).zip" />
+      <ToolZip Include="$(DenoAsset)" Url="https://github.com/denoland/deno/releases/latest/download/$(DenoAsset)" />
+    </ItemGroup>
+    <DownloadFile Condition="!Exists('$(ToolsCache)%(ToolZip.Identity)')" SourceUrl="%(ToolZip.Url)" DestinationFolder="$(ToolsCache)" DestinationFileName="%(ToolZip.Identity).part" Retries="3" />
+    <Move Condition="!Exists('$(ToolsCache)%(ToolZip.Identity)')" SourceFiles="$(ToolsCache)%(ToolZip.Identity).part" DestinationFiles="$(ToolsCache)%(ToolZip.Identity)" />
+
+    <!-- 이전 게시에서 남은 다른 버전의 _internal 파일이 섞이지 않게 비우고 새로 풉니다. -->
+    <RemoveDir Directories="$(ToolsDir)" />
+    <Unzip SourceFiles="$(ToolsCache)yt-dlp-$(YtdlpTag).zip" DestinationFolder="$(ToolsDir)yt-dlp" />
+    <!-- Arm64 묶음은 실행 파일 이름이 yt-dlp_arm64.exe라 ToolManager가 찾는 yt-dlp.exe로 바꿉니다. -->
+    <Move Condition="'$(YtdlpZipExe)' != ''" SourceFiles="$(ToolsDir)yt-dlp/$(YtdlpZipExe)" DestinationFiles="$(ToolsDir)yt-dlp/yt-dlp.exe" />
+    <WriteLinesToFile File="$(ToolsDir)yt-dlp/VERSION" Lines="$(YtdlpTag)" Overwrite="true" />
+    <Unzip SourceFiles="$(ToolsCache)$(DenoAsset)" DestinationFolder="$(ToolsDir)" />
+    <Unzip SourceFiles="$(ToolsCache)$(FFmpegAsset).zip" DestinationFolder="$(ToolsCache)ffmpeg" Include="$(FFmpegAsset)/bin/ffmpeg.exe;$(FFmpegAsset)/bin/ffprobe.exe" />
+    <Copy SourceFiles="$(ToolsCache)ffmpeg/$(FFmpegAsset)/bin/ffmpeg.exe;$(ToolsCache)ffmpeg/$(FFmpegAsset)/bin/ffprobe.exe" DestinationFolder="$(ToolsDir)" />
+    <Error Condition="!Exists('$(ToolsDir)yt-dlp/yt-dlp.exe') Or !Exists('$(ToolsDir)deno.exe')" Text="받은 zip의 구성이 예상과 다릅니다(tools\yt-dlp\yt-dlp.exe 또는 tools\deno.exe가 없음). $(ToolsCache) 폴더를 지우고 다시 시도하십시오." />
+    <Message Importance="high" Text="도구 동봉: yt-dlp $(YtdlpTag), ffmpeg, ffprobe, deno → $(ToolsDir)" />
+  </Target>
+
+</Project>
