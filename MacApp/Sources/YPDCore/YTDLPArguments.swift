@@ -63,14 +63,17 @@ public struct DownloadRequest: Sendable {
     public var baseName: String
     public var tempDirectory: URL
     public var tags: AudioTags?
+    /// 이 Mac이 AV1을 하드웨어로 디코딩할 수 있는지(M3 이상). 그래야 MP4 안의 AV1을 QuickTime·Finder가 엽니다.
+    public var hardwareAV1: Bool
 
-    public init(url: String, options: DownloadOptions, outputDirectory: URL, baseName: String, tempDirectory: URL, tags: AudioTags?) {
+    public init(url: String, options: DownloadOptions, outputDirectory: URL, baseName: String, tempDirectory: URL, tags: AudioTags?, hardwareAV1: Bool = false) {
         self.url = url
         self.options = options
         self.outputDirectory = outputDirectory
         self.baseName = baseName
         self.tempDirectory = tempDirectory
         self.tags = tags
+        self.hardwareAV1 = hardwareAV1
     }
 }
 
@@ -127,7 +130,14 @@ public enum YTDLPArguments {
 
         switch o.mode {
         case .video:
-            let format = langFilter.isEmpty ? "bv*+ba/b" : "bv*+ba\(langFilter)/bv*+ba/b"
+            var format = langFilter.isEmpty ? "bv*+ba/b" : "bv*+ba\(langFilter)/bv*+ba/b"
+            if o.videoContainer == .mp4 {
+                // MP4는 QuickTime·Finder 미리보기·iPhone에서 열려야 하므로 VP9는 빼고 H.264(가능하면 AV1)만 고릅니다.
+                // YouTube의 H.264는 1080p까지라, AV1을 못 쓰는 Mac에서는 MP4가 최대 1080p가 됩니다.
+                // 맞는 형식이 없는 영상만 원래 선택으로 돌아갑니다.
+                let codec = request.hardwareAV1 ? "[vcodec~='^(avc1|av01)']" : "[vcodec^=avc1]"
+                format = "bv*\(codec)+ba\(langFilter)[acodec^=mp4a]/bv*\(codec)+ba[acodec^=mp4a]/bv*\(codec)+ba/" + format
+            }
             // 해상도 제한이 먼저, 같은 해상도 안에서 프레임 레이트를 봅니다.
             var sort = o.preferHighestFPS ? ["res:\(o.maxHeight)", "fps"] : ["res:\(o.maxHeight)"]
             // QuickTime에서 재생되도록 mp4는 H.264/AAC를 우선합니다(해상도가 더 중요).

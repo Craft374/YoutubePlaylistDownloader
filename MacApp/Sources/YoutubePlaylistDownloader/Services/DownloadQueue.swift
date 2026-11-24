@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Observation
+import VideoToolbox
 import YPDCore
 
 @MainActor @Observable
@@ -260,7 +261,7 @@ final class DownloadQueue {
         let tags = job.options.mode == .video ? nil
             : AudioTags.make(entry: item.entry, collectionTitle: job.collectionTitle, collectionUploader: job.collectionUploader)
         let request = DownloadRequest(url: item.entry.url, options: job.options, outputDirectory: job.directory,
-                                      baseName: name, tempDirectory: temp, tags: tags)
+                                      baseName: name, tempDirectory: temp, tags: tags, hardwareAV1: Self.hardwareAV1)
         let arguments = YTDLPArguments.download(request, tools: paths)
         let environment = tools.environment
         let sink = ProgressSink { [weak item, weak job] progress, speed, processing in
@@ -320,6 +321,8 @@ final class DownloadQueue {
         job.openedFolder = true
         NSWorkspace.shared.open(job.directory)
     }
+
+    private static let hardwareAV1 = VTIsHardwareDecodeSupported(kCMVideoCodecType_AV1)
 
     /// APFS는 기본적으로 대소문자를 구분하지 않으므로 키도 소문자로 맞춥니다.
     private static func reservationKey(_ directory: URL, _ name: String) -> String {

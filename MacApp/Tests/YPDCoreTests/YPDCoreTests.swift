@@ -183,6 +183,12 @@ final class YPDCoreTests: XCTestCase {
         o.preferHighestFPS = true
         let fps = YTDLPArguments.download(DownloadRequest(url: "u", options: o, outputDirectory: URL(fileURLWithPath: "/o"), baseName: "n", tempDirectory: URL(fileURLWithPath: "/t"), tags: nil), tools: tools)
         XCTAssertTrue(fps.contains("res:1080,fps,vcodec:h264,acodec:aac"))
+        // MP4는 Apple 기기에서 열리는 코덱만 고르고, 없을 때만 원래 선택으로 돌아갑니다.
+        let fmt = fps[fps.firstIndex(of: "-f")! + 1]
+        XCTAssertTrue(fmt.hasPrefix("bv*[vcodec^=avc1]+ba[acodec^=mp4a]/"))
+        XCTAssertTrue(fmt.hasSuffix("/bv*+ba/b"))
+        let av1 = YTDLPArguments.download(DownloadRequest(url: "u", options: o, outputDirectory: URL(fileURLWithPath: "/o"), baseName: "n", tempDirectory: URL(fileURLWithPath: "/t"), tags: nil, hardwareAV1: true), tools: tools)
+        XCTAssertTrue(av1[av1.firstIndex(of: "-f")! + 1].hasPrefix("bv*[vcodec~='^(avc1|av01)']"))
         XCTAssertFalse(v.contains("--embed-metadata"))
 
         let node = ToolPaths(ytdlp: tools.ytdlp, ffmpeg: nil, jsRuntime: ("node", URL(fileURLWithPath: "/n/node")))
