@@ -88,7 +88,7 @@ dotnet publish WindowsApp/App/App.csproj -c Release -r win-x64 -o out/YoutubePla
 
 ### 알아 둘 점
 
-- 설정, 업데이트한 yt-dlp, 오류 기록(`log.txt`)은 `%LOCALAPPDATA%\YoutubePlaylistDownloader`에 저장됩니다.
+- 포터블입니다. 설정, 업데이트한 yt-dlp, 오류 기록(`log.txt`)은 앱 폴더 안 `data` 폴더에 저장되므로 폴더째 USB 등으로 옮겨 쓸 수 있습니다. 앱 폴더에 쓸 수 없으면(예: `Program Files`) `%LOCALAPPDATA%\YoutubePlaylistDownloader`에 저장합니다.
 - yt-dlp는 앱이 하루 한 번 자동으로 업데이트합니다(설정 → 구성 요소).
 - 앱 폴더 크기는 600MB가 넘고, 대부분 함께 넣은 ffmpeg·ffprobe·deno·yt-dlp입니다.
 - 서명하지 않은 실행 파일이라 처음 실행할 때 SmartScreen이 "Windows의 PC 보호" 창을 띄울 수 있습니다. **추가 정보** → **실행**을 누릅니다.

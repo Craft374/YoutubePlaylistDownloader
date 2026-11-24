@@ -217,6 +217,20 @@ public class ServicesTests
         Assert.All(env.Keys, key => Assert.True(FilenameBuilder.IsEnvironmentVariable(key), key));
     }
 
+    [Fact]
+    public void SupportDirectoryIsPortableUnlessUnwritable()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "ypd-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        string portable = Path.Combine(root, "data");
+        Assert.Equal(portable, ToolManager.PickSupportDirectory(portable, "fallback"));
+        Assert.Empty(Directory.GetFiles(portable, "*", SearchOption.AllDirectories));
+        // 같은 이름의 파일이 있어 폴더를 만들 수 없으면 대신 쓸 곳으로 갑니다.
+        string blocked = Path.Combine(root, "blocked");
+        File.WriteAllText(blocked, "");
+        Assert.Equal("fallback", ToolManager.PickSupportDirectory(blocked, "fallback"));
+    }
+
     // 실제 프로세스: Windows에는 /bin/sh가 없어 Mac·Linux에서만 확인합니다.
 
     private static Task<ProcessResult> Shell(string script, List<string>? lines = null, bool collect = false, CancellationToken token = default) =>

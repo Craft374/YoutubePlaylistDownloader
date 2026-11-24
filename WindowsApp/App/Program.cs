@@ -68,7 +68,7 @@ public static class Program
     private static extern int CoWaitForMultipleObjects(uint flags, uint timeout, uint count, IntPtr[] handles, out uint index);
 }
 
-/// <summary>처리하지 못한 예외를 %LOCALAPPDATA%\YoutubePlaylistDownloader\log.txt에 남깁니다. 사용자가 오류를 알려 줄 때 씁니다.</summary>
+/// <summary>처리하지 못한 예외를 SupportDirectory(실행 파일 옆 data 폴더)의 log.txt에 남깁니다. 사용자가 오류를 알려 줄 때 씁니다.</summary>
 public static class CrashLog
 {
     private static readonly string LogPath = Path.Combine(Core.ToolManager.SupportDirectory, "log.txt");

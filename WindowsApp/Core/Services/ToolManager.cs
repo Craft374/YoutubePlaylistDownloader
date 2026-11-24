@@ -42,8 +42,25 @@ public sealed partial class ToolManager : ObservableObject
 
     public bool IsReady => Paths != null;
 
-    public static string SupportDirectory { get; } =
-        Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "YoutubePlaylistDownloader");
+    /// <summary>설정·업데이트한 yt-dlp·log.txt를 두는 곳. 포터블로 쓰도록 실행 파일 옆 data 폴더를 씁니다.</summary>
+    public static string SupportDirectory { get; } = PickSupportDirectory(
+        Path.Combine(AppContext.BaseDirectory, "data"),
+        Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "YoutubePlaylistDownloader"));
+
+    /// <summary>portable에 쓸 수 있으면 그곳을, 없으면(Program Files 같은 읽기 전용 위치) fallback을 돌려줍니다.</summary>
+    internal static string PickSupportDirectory(string portable, string fallback)
+    {
+        try
+        {
+            Directory.CreateDirectory(portable);
+            using (File.Create(Path.Combine(portable, ".write-test"), 1, FileOptions.DeleteOnClose)) { }
+            return portable;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return fallback;
+        }
+    }
     public static string ManagedYTDLPRoot => Path.Combine(SupportDirectory, "yt-dlp");
     public static string BundledToolsDirectory => Path.Combine(AppContext.BaseDirectory, "tools");
 

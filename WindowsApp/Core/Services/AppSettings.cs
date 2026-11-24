@@ -9,7 +9,7 @@ public enum Appearance { System, Light, Dark }
 public enum AppLanguage { System, En, Ko }
 
 /// <summary>
-/// 앱 설정과 다운로드 옵션. 바뀌는 즉시 %LOCALAPPDATA%\YoutubePlaylistDownloader\settings.json에 저장합니다.
+/// 앱 설정과 다운로드 옵션. 바뀌는 즉시 SupportDirectory의 settings.json에 저장합니다.
 /// 패키지 앱 전용 API(ApplicationData)는 패키지 없이 실행하면 예외가 나므로 파일을 직접 씁니다.
 /// 파일의 키를 하나씩 읽어(LenientJsonConverter) 없는 키는 기본값을 쓰므로, 새 설정을 추가해도 기존 설정이 지워지지 않습니다.
 /// UI 스레드에서만 바꿉니다.
