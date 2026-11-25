@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:YPD.Desktop"
+             x:Class="YPD.Desktop.DownloadsView">
+  <!-- "다운로드" 화면(Mac QueueView). 최근 작업이 위에 옵니다. -->
+  <Grid RowDefinitions="Auto,*">
+    <StackPanel Orientation="Horizontal" Spacing="8" Margin="28,0,28,10">
+      <Button Name="ClearFinished" ToolTip.Tip="{local:Tr 'Remove finished downloads from the list'}">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <local:Icon Data="{StaticResource IconBroom}" Width="15" Height="15" />
+          <TextBlock Text="{local:Tr 'Clear Finished'}" VerticalAlignment="Center" />
+        </StackPanel>
+      </Button>
+      <Button Name="StopAll" ToolTip.Tip="{local:Tr 'Stop all downloads'}">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <local:Icon Data="{StaticResource IconStop}" Width="14" Height="14" />
+          <TextBlock Text="{local:Tr 'Stop All'}" VerticalAlignment="Center" />
+        </StackPanel>
+      </Button>
+    </StackPanel>
+
+    <!-- 보이는 줄만 만들고(가상화), 줄은 자기 작업만 구독해 진행률이 바뀌면 그 줄만 고칩니다. -->
+    <ScrollViewer Name="Scroller" Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+      <ItemsControl Name="List" Margin="24,0,24,24">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <VirtualizingStackPanel />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <StackPanel Name="Empty" Grid.Row="1" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,40">
+      <local:Icon Data="{StaticResource IconDownload}" Classes="tertiary" Width="44" Height="44" />
+      <TextBlock Text="{local:Tr 'No Downloads'}" Classes="title" HorizontalAlignment="Center" Margin="0,8,0,0" />
+      <TextBlock Text="{local:Tr 'Videos you download appear here'}" Classes="secondary" HorizontalAlignment="Center" />
+      <Button Name="NewDownload" Content="{local:Tr 'New Download'}" HorizontalAlignment="Center" Margin="0,10,0,0" />
+    </StackPanel>
+  </Grid>
+</UserControl>

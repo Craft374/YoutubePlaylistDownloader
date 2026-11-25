@@ -1,0 +1,117 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:YPD.Desktop"
+             x:Class="YPD.Desktop.SettingsView">
+  <!-- 설정(Mac SettingsView의 일반·구성 요소 탭을 한 화면에). 그룹 카드 안에 "왼쪽 이름, 오른쪽 컨트롤" 줄. -->
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel MaxWidth="720" Margin="28,0,28,32">
+
+      <TextBlock Classes="section" Text="{local:Tr 'General'}" Margin="4,4,0,8" />
+      <Border Classes="card">
+        <StackPanel Name="GeneralRows">
+          <Border Classes="row">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <TextBlock Classes="rowLabel" Text="{local:Tr 'Appearance'}" />
+              <Border Grid.Column="1" Classes="segmentTrack">
+                <StackPanel Orientation="Horizontal">
+                  <RadioButton Name="SystemMode" Classes="segment" GroupName="appearance" Content="{local:Tr 'System'}" />
+                  <RadioButton Name="LightMode" Classes="segment" GroupName="appearance" Content="{local:Tr 'Light'}" />
+                  <RadioButton Name="DarkMode" Classes="segment" GroupName="appearance" Content="{local:Tr 'Dark'}" />
+                </StackPanel>
+              </Border>
+            </Grid>
+          </Border>
+          <Border Classes="row">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <StackPanel VerticalAlignment="Center" Spacing="2">
+                <TextBlock Text="{local:Tr 'Language'}" />
+                <TextBlock Classes="caption" Text="{local:Tr 'Takes effect the next time you open the app'}" />
+              </StackPanel>
+              <ComboBox Name="Language" Grid.Column="1" MinWidth="140" VerticalAlignment="Center" AutomationProperties.Name="{local:Tr 'Language'}" />
+            </Grid>
+          </Border>
+          <Border Classes="row">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+              <local:Icon Data="{StaticResource IconFolder}" Stroke="{DynamicResource YpdAccent}" VerticalAlignment="Center" />
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                <TextBlock Text="{local:Tr 'Save to'}" />
+                <TextBlock Name="SaveDirectory" Classes="caption" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+              <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                <Button Name="ChooseFolder" Content="{local:Tr 'Choose…'}" />
+                <Button Name="RevealFolder" Classes="icon">
+                  <local:Icon Data="{StaticResource IconFolder}" Width="16" Height="16" />
+                </Button>
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Classes="row">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <TextBlock Classes="rowLabel" Text="{local:Tr 'Simultaneous downloads'}" />
+              <NumericUpDown Name="Concurrency" Grid.Column="1" Width="110" FormatString="0" VerticalAlignment="Center"
+                             AutomationProperties.Name="{local:Tr 'Simultaneous downloads'}" />
+            </Grid>
+          </Border>
+          <Border Classes="row">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <TextBlock Classes="rowLabel" Text="{local:Tr 'Ask before quitting while downloading'}" />
+              <ToggleSwitch Name="ConfirmQuit" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Ask before quitting while downloading'}" />
+            </Grid>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="section" Text="{local:Tr 'Components'}" />
+      <Border Classes="card">
+        <StackPanel Name="ComponentRows">
+          <local:ComponentRow Name="Ytdlp" Classes="row" />
+          <local:ComponentRow Name="Ffmpeg" Classes="row" />
+          <local:ComponentRow Name="JsRuntime" Classes="row" />
+        </StackPanel>
+      </Border>
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="4,10,0,0">
+        <StackPanel Name="InstallHint" Spacing="4">
+          <TextBlock Name="InstallTitle" Classes="caption" />
+          <SelectableTextBlock Name="InstallFFmpeg" Classes="mono" FontSize="12" />
+          <SelectableTextBlock Name="InstallDeno" Classes="mono" FontSize="12" />
+          <TextBlock Classes="caption" Text="{local:Tr 'Restart the app after installing them.'}" />
+        </StackPanel>
+        <Button Name="CheckAgain" Grid.Column="1" VerticalAlignment="Top" Content="{local:Tr 'Check Again'}" />
+      </Grid>
+
+      <TextBlock Classes="section" Text="{local:Tr 'Updates'}" />
+      <Border Classes="card">
+        <StackPanel Name="UpdateRows">
+          <Border Classes="row">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <StackPanel VerticalAlignment="Center" Spacing="2">
+                <TextBlock Text="yt-dlp" />
+                <SelectableTextBlock Name="UpdateStatus" Classes="caption" TextWrapping="Wrap" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <ProgressBar Name="UpdateProgress" IsIndeterminate="True" Width="48" VerticalAlignment="Center" />
+                <Button Name="UpdateButton" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Classes="row">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <TextBlock Classes="rowLabel" Text="{local:Tr 'Keep yt-dlp up to date automatically'}" />
+              <ToggleSwitch Name="AutoUpdate" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Keep yt-dlp up to date automatically'}" />
+            </Grid>
+          </Border>
+          <Border Classes="row">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <StackPanel VerticalAlignment="Center" Spacing="2">
+                <TextBlock Text="{local:Tr 'Data folder'}" />
+                <SelectableTextBlock Name="DataFolder" Classes="caption" TextWrapping="Wrap" />
+              </StackPanel>
+              <Button Name="OpenData" Grid.Column="1" VerticalAlignment="Center" Content="{local:Tr 'Open'}"
+                      AutomationProperties.Name="{local:Tr 'Open Data Folder'}" />
+            </Grid>
+          </Border>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

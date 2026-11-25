@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:YPD.Desktop"
+             x:Class="YPD.Desktop.ItemRow"
+             Padding="4,5" Background="Transparent">
+  <!-- 펼친 작업 안의 항목 한 줄: 상태 아이콘, 번호, 제목, 진행률, 실패 이유. -->
+  <StackPanel Spacing="2">
+    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
+      <local:Icon Name="StateIcon" Width="15" Height="15" VerticalAlignment="Center" />
+      <TextBlock Name="IndexText" Grid.Column="1" Classes="tertiary" VerticalAlignment="Center" />
+      <TextBlock Name="TitleText" Grid.Column="2" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+      <TextBlock Name="PercentText" Grid.Column="3" Classes="secondary" VerticalAlignment="Center" />
+    </Grid>
+    <SelectableTextBlock Name="ErrorText" Classes="caption" Foreground="{DynamicResource YpdDanger}" MaxLines="3" Margin="23,0,0,0" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:YPD.Desktop"
+             x:Class="YPD.Desktop.BulkDownloadView">
+  <!-- 여러 링크를 한 번에 대기열에 넣습니다(Mac BulkDownloadView). -->
+  <ScrollViewer>
+    <StackPanel MaxWidth="680" Margin="32,8,32,32" Spacing="20">
+      <TextBlock Classes="secondary" TextWrapping="Wrap"
+                 Text="{local:Tr 'Paste one link per line. Each link becomes its own download'}" />
+
+      <StackPanel Spacing="12">
+        <TextBox Name="Editor" Classes="mono" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="220" MaxHeight="420"
+                 CornerRadius="12" Padding="12,10" PlaceholderText="https://www.youtube.com/playlist?list=…"
+                 AutomationProperties.Name="{local:Tr 'Paste one link per line. Each link becomes its own download'}" />
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Name="Count" Classes="secondary" VerticalAlignment="Center" />
+          <Button Name="DownloadAll" Grid.Column="1" Classes="brand" Content="{local:Tr 'Download All'}" />
+        </Grid>
+      </StackPanel>
+
+      <!-- 진행 -->
+      <Border Name="ProgressCard" Classes="card" Padding="16" IsVisible="False">
+        <StackPanel Spacing="10">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Name="ProgressText" VerticalAlignment="Center" />
+            <Button Name="StopButton" Grid.Column="1" Content="{local:Tr 'Stop'}" />
+          </Grid>
+          <ProgressBar Name="Progress" Maximum="1" />
+          <TextBlock Name="Current" Classes="caption mono" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+      </Border>
+
+      <!-- 결과 -->
+      <Grid Name="AddedRow" ColumnDefinitions="*,Auto" IsVisible="False">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <local:Icon Data="{StaticResource IconCheckCircle}" Classes="success" />
+          <TextBlock Name="AddedText" VerticalAlignment="Center" />
+        </StackPanel>
+        <Button Name="ShowDownloads" Grid.Column="1" Content="{local:Tr 'Show Downloads'}" />
+      </Grid>
+
+      <Border Name="FailureCard" Classes="card" Padding="16" IsVisible="False">
+        <StackPanel Spacing="12">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <local:Icon Data="{StaticResource IconAlert}" Classes="warning" />
+            <TextBlock Name="FailureTitle" FontWeight="SemiBold" TextWrapping="Wrap" VerticalAlignment="Center" />
+          </StackPanel>
+          <!-- 링크가 수천 개여도 가볍도록 읽기 전용 입력란 하나에 줄로 넣습니다(선택해 복사할 수 있습니다). -->
+          <TextBox Name="FailureList" Classes="mono" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                   MaxHeight="240" FontSize="12" />
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Name="RetryButton" Content="{local:Tr 'Retry'}" />
+              <Button Name="CopyButton" Content="{local:Tr 'Copy'}" />
+              <Button Name="SaveButton" Content="{local:Tr 'Save…'}" />
+            </StackPanel>
+            <Button Name="DismissButton" Grid.Column="1" Content="{local:Tr 'Dismiss'}" />
+          </Grid>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,8 +1,6 @@
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Styling;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using YPD.Core;
 
@@ -41,9 +39,6 @@ public partial class OptionsPanel : UserControl
             tokens.Items.Add(item);
         }
         InsertToken.Flyout = tokens;
-        // SukiUI의 ToggleSwitch는 스위치 오른쪽에 12px 칸을 고정으로 두어, 콤보 상자와 오른쪽 끝을 맞춥니다.
-        if (ThemeChoice.Current == UiTheme.Suki)
-            Styles.Add(new Style(x => x.OfType<ToggleSwitch>()) { Setters = { new Setter(MarginProperty, new Thickness(0, 0, -12, 0)) } });
 
         Wire();
         Refresh();
@@ -70,7 +65,7 @@ public partial class OptionsPanel : UserControl
         AudioLanguage.SelectionChanged += (_, _) =>
             Change(o => o.AudioLanguage = AudioLanguage.SelectedIndex == 0 ? "" : Languages[AudioLanguage.SelectedIndex - 1].Code);
 
-        ChooseFolder.Click += async (_, _) => await ChooseFolderAsync();
+        ChooseFolder.Click += async (_, _) => await Ui.ChooseSaveFolderAsync(this);
         Subfolders.IsCheckedChanged += (_, _) => Change(o => o.SavePlaylistsInSubfolders = Subfolders.IsChecked == true);
         Pattern.TextChanged += (_, _) => { if (Pattern.Text != settings.Options.FilenamePattern) Change(o => o.FilenamePattern = Pattern.Text ?? ""); };
         ResetPattern.Click += (_, _) => Change(o => o.FilenamePattern = DownloadOptions.DefaultPattern);
@@ -87,9 +82,6 @@ public partial class OptionsPanel : UserControl
 
         ResetOptions.Click += (_, _) => settings.Options = new DownloadOptions();
     }
-
-    /// <summary>맥에서는 제목 표시줄 자리(44)만큼 내려 시작합니다.</summary>
-    public void SetTopInset(double top) => Body.Margin = new Thickness(16, top, 16, 20);
 
     private void Change(Action<DownloadOptions> change)
     {
@@ -143,7 +135,7 @@ public partial class OptionsPanel : UserControl
             MediaFooter.IsVisible = footer != null;
 
             string dir = settings.SaveDirectory;
-            FolderName.Text = Path.GetFileName(Path.TrimEndingDirectorySeparator(dir)) is { Length: > 0 } name ? name : dir;
+            FolderName.Text = Ui.FolderDisplayName(dir);
             FolderPath.Text = dir;
             ToolTip.SetTip(FolderPath, dir);
             Subfolders.IsChecked = o.SavePlaylistsInSubfolders;
@@ -164,42 +156,11 @@ public partial class OptionsPanel : UserControl
             FilterMinutes.Value = (decimal)o.FilterMinutes;
             LengthRow.IsVisible = o.FilterByLength;
 
-            foreach (var rows in new[] { MediaRows, FileRows, PlaylistRows }) UpdateDividers(rows);
+            foreach (var rows in new[] { MediaRows, FileRows, PlaylistRows }) Ui.UpdateDividers(rows);
         }
         finally
         {
             updating = false;
-        }
-    }
-
-    /// <summary>보이는 줄 사이에만 구분선을 긋습니다(맨 위 줄은 카드 테두리와 겹치므로 뺍니다).</summary>
-    private static void UpdateDividers(Panel rows)
-    {
-        bool first = true;
-        foreach (var row in rows.Children)
-        {
-            if (!row.IsVisible) continue;
-            row.Classes.Set("divided", !first);
-            first = false;
-        }
-    }
-
-    private async Task ChooseFolderAsync()
-    {
-        try
-        {
-            if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
-            var start = await storage.TryGetFolderFromPathAsync(settings.SaveDirectory);
-            var folders = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
-            {
-                Title = L.T("Save to"),
-                SuggestedStartLocation = start,
-            });
-            if (folders.Count > 0 && folders[0].TryGetLocalPath() is { Length: > 0 } path) settings.SaveDirectory = path;
-        }
-        catch (Exception)
-        {
-            // 시제품: 선택 창을 못 열면 그대로 둡니다.
         }
     }
 

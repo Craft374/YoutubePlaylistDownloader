@@ -190,13 +190,13 @@ public partial class NewDownloadView : UserControl
         bool idle = phase == Phase.Idle;
         bool hasText = !string.IsNullOrEmpty(Box.Text);
         ClearButton.IsVisible = hasText;
-        Invalid.IsVisible = idle && looksInvalid;
-        Added.IsVisible = idle && showAdded;
-        Resolving.IsVisible = phase == Phase.Resolving;
-        Failure.IsVisible = phase == Phase.Failed;
+        Motion.SetVisible(Invalid, idle && looksInvalid);
+        Motion.SetVisible(Added, idle && showAdded);
+        Motion.SetVisible(Resolving, phase == Phase.Resolving);
+        Motion.SetVisible(Failure, phase == Phase.Failed);
         FailureText.Text = failure ?? "";
         bool resolved = phase == Phase.Resolved && source != null;
-        Result.IsVisible = resolved;
+        Motion.SetVisible(Result, resolved);
         if (resolved && source != shownSource)
         {
             shownSource = source;

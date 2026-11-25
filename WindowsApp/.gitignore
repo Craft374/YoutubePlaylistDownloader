@@ -3,3 +3,4 @@ obj/
 .vs/
 *.user
 App/tools-cache/
+AvaloniaApp/tools-cache/

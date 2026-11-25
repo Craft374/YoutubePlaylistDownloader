@@ -14,30 +14,21 @@
         </DataTemplate>
       </Setter>
     </Style>
-    <Style Selector="ToggleSwitch">
-      <Setter Property="OnContent" Value="" />
-      <Setter Property="OffContent" Value="" />
-      <Setter Property="MinWidth" Value="0" />
-    </Style>
     <Style Selector="NumericUpDown">
       <Setter Property="Width" Value="110" />
       <Setter Property="FormatString" Value="0" />
     </Style>
   </UserControl.Styles>
-  <UserControl.Resources>
-    <!-- Semi의 ToggleSwitch는 빈 글 칸에도 좌우 8px을 남겨 오른쪽 끝이 콤보 상자와 어긋납니다. -->
-    <Thickness x:Key="ToggleSwitchOnContentMargin">0</Thickness>
-  </UserControl.Resources>
 
   <Border Background="{DynamicResource YpdSidebarBackground}" BorderBrush="{DynamicResource YpdDivider}" BorderThickness="1,0,0,0">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-      <StackPanel Name="Body" Margin="16,8,16,20">
+      <StackPanel Name="Body" Margin="16,4,16,20">
 
         <!-- 형식 -->
         <TextBlock Classes="section" Text="{local:Tr 'Format'}" Margin="4,4,0,8" />
         <Border Classes="card" Padding="10">
           <StackPanel Spacing="10">
-            <Border Background="{DynamicResource YpdSegmentTrack}" CornerRadius="9" Padding="2">
+            <Border Classes="segmentTrack">
               <!-- "원본 오디오"가 1/3 칸에 들어가지 않아 그 칸만 글 폭을 씁니다. -->
               <Grid ColumnDefinitions="*,*,Auto">
                 <RadioButton Name="ModeVideo" Classes="segment" GroupName="mode" Content="{local:Tr 'Video'}" />
@@ -141,7 +132,7 @@
               <StackPanel Spacing="8">
                 <TextBlock Text="{local:Tr 'File name'}" />
                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
-                  <TextBox Name="Pattern" FontFamily="Cascadia Mono, Consolas, Menlo, monospace" AutomationProperties.Name="{local:Tr 'File name'}" />
+                  <TextBox Name="Pattern" Classes="mono" AutomationProperties.Name="{local:Tr 'File name'}" />
                   <Button Name="ResetPattern" Grid.Column="1" Classes="icon" VerticalAlignment="Center" ToolTip.Tip="{local:Tr 'Reset to $title'}">
                     <local:Icon Data="{StaticResource IconReset}" Width="16" Height="16" />
                   </Button>

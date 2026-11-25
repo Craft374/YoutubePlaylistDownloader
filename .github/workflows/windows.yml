@@ -1,16 +1,17 @@
-# Windows 앱을 실제 Windows에서 빌드합니다(맥에서는 컴파일 확인만 가능). 결과물은 Actions 실행 페이지의 Artifacts에서 받습니다.
-name: Windows
+# Avalonia 앱을 Windows(x64, Arm64)와 macOS(Apple Silicon)에서 빌드합니다. 결과물은 Actions 실행 페이지의 Artifacts에서 받습니다.
+name: Desktop
 
 on:
   push:
     branches: [master]
     paths:
       - 'WindowsApp/**'
+      - 'MacApp/Resources/**'
       - '.github/workflows/windows.yml'
   workflow_dispatch:
 
 jobs:
-  build:
+  windows:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -22,11 +23,26 @@ jobs:
           dotnet-version: 10.0.x
       - run: dotnet test WindowsApp/Core.Tests -c Release
         if: matrix.rid == 'win-x64'
-      # 게시할 때 yt-dlp·ffmpeg·ffprobe·deno를 받아 tools\에 넣습니다(App.csproj의 BundleTools).
-      - run: dotnet publish WindowsApp/App/App.csproj -c Release -r ${{ matrix.rid }} -o out/YoutubePlaylistDownloader
-      # PRI가 빠지면 앱이 시작하자마자 꺼지므로 확인합니다.
-      - run: if (!(Test-Path out/YoutubePlaylistDownloader/YoutubePlaylistDownloader.pri)) { throw 'YoutubePlaylistDownloader.pri is missing from the publish folder' }
+      # 게시할 때 yt-dlp·ffmpeg·ffprobe·deno를 받아 tools\에 넣습니다(AvaloniaApp.csproj의 BundleTools).
+      - run: dotnet publish WindowsApp/AvaloniaApp/AvaloniaApp.csproj -c Release -r ${{ matrix.rid }} -o out/YoutubePlaylistDownloader
+      - run: if (!(Test-Path out/YoutubePlaylistDownloader/tools/yt-dlp/yt-dlp.exe)) { throw 'tools\yt-dlp\yt-dlp.exe is missing from the publish folder' }
       - uses: actions/upload-artifact@v4
         with:
           name: YoutubePlaylistDownloader-${{ matrix.rid }}
           path: out/
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet test WindowsApp/Core.Tests -c Release
+      - run: WindowsApp/scripts/build-mac.sh
+      # upload-artifact는 실행 권한을 잃으므로 묶어서 올립니다. 받은 뒤 "xattr -cr"로 격리 표시를 지워야 열립니다(서명하지 않은 앱).
+      - run: tar -czf YoutubePlaylistDownloader-osx-arm64.tar.gz -C WindowsApp/bin/mac/osx-arm64 "YouTube Playlist Downloader.app"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YoutubePlaylistDownloader-osx-arm64
+          path: YoutubePlaylistDownloader-osx-arm64.tar.gz

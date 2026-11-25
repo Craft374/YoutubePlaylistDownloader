@@ -2,49 +2,42 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="using:YPD.Desktop"
         x:Class="YPD.Desktop.MainWindow"
-        Title="{local:Tr 'YouTube Playlist Downloader'}"
-        Icon="avares://YPDDesktop/Assets/AppIcon.ico"
-        Width="1080" Height="700" MinWidth="900" MinHeight="560"
+        Title="YouTube Playlist Downloader"
+        Icon="avares://YoutubePlaylistDownloader/Assets/AppIcon.ico"
+        Width="1080" Height="700" MinWidth="960" MinHeight="540"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource YpdWindowBackground}">
-  <!-- 사이드바(220) | 화면 | 옵션 패널(300, 켜고 끔). 맥에서는 제목 표시줄을 화면 안으로 넓혀 한 장으로 보이게 합니다(MainWindow.axaml.cs). -->
-  <Grid ColumnDefinitions="220,*,Auto">
+  <!-- 사이드바(232) | 머리글 + 화면 | 옵션 패널(300, 오른쪽에서 들어오고 오른쪽으로 나감).
+       사이드바는 OS 재질(Windows 11 Mica, 맥 비브랜시)을 받을 수 있으면 반투명, 아니면 단색입니다(MainWindow.axaml.cs). -->
+  <Grid ColumnDefinitions="232,*">
 
     <!-- 사이드바 -->
-    <Border Background="{DynamicResource YpdSidebarBackground}" BorderBrush="{DynamicResource YpdDivider}" BorderThickness="0,0,1,0">
-      <DockPanel Margin="12,0,12,12">
-        <!-- 맨 위 빈칸은 창 끌기 영역이자 맥의 신호등 버튼 자리입니다. -->
+    <Border Name="Sidebar" Background="{DynamicResource YpdSidebarBackground}" BorderBrush="{DynamicResource YpdDivider}" BorderThickness="0,0,1,0">
+      <DockPanel Margin="10,0,10,12">
+        <!-- 맨 위 빈칸: 맥에서는 신호등 버튼 자리이자 창 끌기 영역입니다. -->
         <Border Name="SidebarDrag" DockPanel.Dock="Top" Height="44" Background="Transparent" />
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="6,0,0,18">
-          <local:Logo Width="28" Height="28" />
-          <TextBlock Text="YT Downloader" FontWeight="SemiBold" FontSize="15" VerticalAlignment="Center" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="8,0,0,16">
+          <local:Logo Width="26" Height="26" />
+          <TextBlock Text="YT Downloader" Classes="headline" VerticalAlignment="Center" />
         </StackPanel>
 
-        <!-- 아래쪽: 테마 바꾸기(시제품 전용), 화면 모드, 도구 안내 -->
+        <!-- 아래쪽: 구성 요소 안내, 설정 -->
         <StackPanel DockPanel.Dock="Bottom" Spacing="10">
           <Border Name="ToolBanner" Classes="card" Padding="12,10" IsVisible="False">
             <StackPanel Spacing="4">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <local:Icon Data="{StaticResource IconAlert}" Width="14" Height="14" Stroke="#F5A524" />
-                <TextBlock Name="ToolBannerTitle" FontSize="12" FontWeight="SemiBold" />
+                <local:Icon Data="{StaticResource IconAlert}" Classes="warning" Width="14" Height="14" />
+                <TextBlock Text="{local:Tr 'Components'}" FontSize="12" FontWeight="SemiBold" />
               </StackPanel>
               <TextBlock Name="ToolBannerText" Classes="caption" />
             </StackPanel>
           </Border>
-          <TextBlock Name="ThemeLabel" Classes="caption" Margin="4,0,0,0" />
-          <Border Background="{DynamicResource YpdSegmentTrack}" BorderBrush="{DynamicResource YpdCardBorder}" BorderThickness="1" CornerRadius="9" Padding="2">
-            <UniformGrid Columns="2">
-              <RadioButton Name="SukiButton" Classes="segment" GroupName="uiTheme" Content="SukiUI" />
-              <RadioButton Name="SemiButton" Classes="segment" GroupName="uiTheme" Content="Semi" />
-            </UniformGrid>
-          </Border>
-          <Border Background="{DynamicResource YpdSegmentTrack}" BorderBrush="{DynamicResource YpdCardBorder}" BorderThickness="1" CornerRadius="9" Padding="2">
-            <UniformGrid Columns="3">
-              <RadioButton Name="SystemMode" Classes="segment" GroupName="appearance" Content="{local:Tr 'System'}" />
-              <RadioButton Name="LightMode" Classes="segment" GroupName="appearance" Content="{local:Tr 'Light'}" />
-              <RadioButton Name="DarkMode" Classes="segment" GroupName="appearance" Content="{local:Tr 'Dark'}" />
-            </UniformGrid>
-          </Border>
+          <RadioButton Name="NavSettings" Classes="nav" GroupName="nav">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <local:Icon Data="{StaticResource IconSettings}" />
+              <TextBlock Text="{local:Tr 'Settings'}" VerticalAlignment="Center" />
+            </StackPanel>
+          </RadioButton>
         </StackPanel>
 
         <StackPanel Spacing="2">
@@ -61,36 +54,44 @@
             </StackPanel>
           </RadioButton>
           <RadioButton Name="NavQueue" Classes="nav" GroupName="nav">
-            <StackPanel Orientation="Horizontal" Spacing="10">
-              <local:Icon Data="{StaticResource IconDownload}" />
-              <TextBlock Text="{local:Tr 'Downloads'}" VerticalAlignment="Center" />
-            </StackPanel>
-          </RadioButton>
-          <RadioButton Name="NavSettings" Classes="nav" GroupName="nav">
-            <StackPanel Orientation="Horizontal" Spacing="10">
-              <local:Icon Data="{StaticResource IconSettings}" />
-              <TextBlock Text="{local:Tr 'Settings'}" VerticalAlignment="Center" />
-            </StackPanel>
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <local:Icon Data="{StaticResource IconDownload}" />
+                <TextBlock Text="{local:Tr 'Downloads'}" VerticalAlignment="Center" />
+              </StackPanel>
+              <!-- 진행 중인 작업 수 -->
+              <Border Name="Badge" Grid.Column="1" Classes="badge" VerticalAlignment="Center" IsVisible="False">
+                <TextBlock Name="BadgeText" Foreground="White" FontSize="11" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+            </Grid>
           </RadioButton>
         </StackPanel>
       </DockPanel>
     </Border>
 
-    <!-- 화면 -->
-    <Grid Grid.Column="1" RowDefinitions="44,*">
-      <Border Name="TopDrag" Background="Transparent">
-        <ToggleButton Name="OptionsToggle" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,6,12,0"
-                      ToolTip.Tip="{local:Tr 'Show or hide download options'}">
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <local:Icon Data="{StaticResource IconSliders}" Width="16" Height="16" Stroke="{Binding $parent[ToggleButton].Foreground}" />
-            <TextBlock Text="{local:Tr 'Download Options'}" VerticalAlignment="Center" />
-          </StackPanel>
-        </ToggleButton>
+    <!-- 머리글(화면 제목 + 옵션 버튼)과 그 아래 화면 | 옵션 패널 -->
+    <Grid Grid.Column="1" RowDefinitions="Auto,*" ColumnDefinitions="*,Auto" Background="{DynamicResource YpdWindowBackground}">
+      <Border Name="Header" Grid.ColumnSpan="2" Background="Transparent" Padding="28,0,14,0" Height="56">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Name="PageTitle" Classes="title" VerticalAlignment="Center" />
+          <ToggleButton Name="OptionsToggle" Grid.Column="1" VerticalAlignment="Center"
+                        ToolTip.Tip="{local:Tr 'Show or hide download options'}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <local:Icon Data="{StaticResource IconSliders}" Width="16" Height="16" Stroke="{Binding $parent[ToggleButton].Foreground}" />
+              <TextBlock Text="{local:Tr 'Download Options'}" VerticalAlignment="Center" />
+            </StackPanel>
+          </ToggleButton>
+        </Grid>
       </Border>
-      <ContentControl Name="PageHost" Grid.Row="1" />
-    </Grid>
 
-    <!-- 옵션 패널 -->
-    <local:OptionsPanel Name="Options" Grid.Column="2" Width="300" IsVisible="False" />
+      <!-- 화면 네 개를 모두 붙여 두고 하나만 보입니다. 화면을 오가도 입력한 내용과 진행 중인 일괄 추가가 남습니다. -->
+      <Panel Name="Pages" Grid.Row="1" />
+
+      <!-- 폭이 0↔300으로 움직이고, 안의 패널은 왼쪽에 붙어 있어 오른쪽 끝에서 미끄러져 들어옵니다. -->
+      <Border Name="OptionsHost" Grid.Row="1" Grid.Column="1" Width="0" ClipToBounds="True" IsVisible="False">
+        <local:OptionsPanel Name="Options" Width="300" HorizontalAlignment="Left" />
+      </Border>
+    </Grid>
   </Grid>
 </Window>

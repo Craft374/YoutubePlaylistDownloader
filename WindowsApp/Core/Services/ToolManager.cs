@@ -42,10 +42,16 @@ public sealed partial class ToolManager : ObservableObject
 
     public bool IsReady => Paths != null;
 
-    /// <summary>설정·업데이트한 yt-dlp·log.txt를 두는 곳. 포터블로 쓰도록 실행 파일 옆 data 폴더를 씁니다.</summary>
-    public static string SupportDirectory { get; } = PickSupportDirectory(
-        Path.Combine(AppContext.BaseDirectory, "data"),
-        Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "YoutubePlaylistDownloader"));
+    private static string UserSupportDirectory =>
+        Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "YoutubePlaylistDownloader");
+
+    /// <summary>
+    /// 설정·업데이트한 yt-dlp·log.txt를 두는 곳. Windows는 포터블로 쓰도록 실행 파일 옆 data 폴더를,
+    /// 맥은 ~/Library/Application Support를 씁니다(.app 안에 쓰면 서명이 깨집니다. SwiftUI 맥 앱과 같은 폴더라 받은 yt-dlp를 같이 씁니다).
+    /// </summary>
+    public static string SupportDirectory { get; } = OperatingSystem.IsWindows()
+        ? PickSupportDirectory(Path.Combine(AppContext.BaseDirectory, "data"), UserSupportDirectory)
+        : UserSupportDirectory;
 
     /// <summary>portable에 쓸 수 있으면 그곳을, 없으면(Program Files 같은 읽기 전용 위치) fallback을 돌려줍니다.</summary>
     internal static string PickSupportDirectory(string portable, string fallback)
@@ -62,9 +68,19 @@ public sealed partial class ToolManager : ObservableObject
         }
     }
     public static string ManagedYTDLPRoot => Path.Combine(SupportDirectory, "yt-dlp");
-    public static string BundledToolsDirectory => Path.Combine(AppContext.BaseDirectory, "tools");
+    /// <summary>Windows는 실행 파일 옆 tools, 맥은 .app의 Contents/Resources/tools(실행 파일은 Contents/MacOS).</summary>
+    public static string BundledToolsDirectory { get; } = OperatingSystem.IsMacOS()
+        ? Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "Resources", "tools"))
+        : Path.Combine(AppContext.BaseDirectory, "tools");
 
-    private const string YtdlpExe = "yt-dlp.exe";
+    /// <summary>yt-dlp onedir 묶음의 실행 파일 이름(맥 묶음은 yt-dlp_macos).</summary>
+    internal static string YtdlpExe => OperatingSystem.IsWindows() ? "yt-dlp.exe" : "yt-dlp_macos";
+
+    /// <summary>실행 파일 이름: Windows는 .exe를 붙입니다.</summary>
+    private static string Exe(string name) => OperatingSystem.IsWindows() ? name + ".exe" : name;
+
+    /// <summary>Finder에서 연 맥 앱은 셸의 PATH를 물려받지 않아 Homebrew 폴더를 따로 봅니다(SwiftUI 맥 앱과 같음).</summary>
+    private static readonly string[] SystemDirectories = OperatingSystem.IsWindows() ? [] : ["/opt/homebrew/bin", "/usr/local/bin"];
 
     /// <summary>자식 프로세스 PATH 앞에 넣을 폴더(ffprobe 등 yt-dlp가 이름으로 찾는 도구용).</summary>
     public List<string> ToolDirectories
@@ -74,6 +90,7 @@ public sealed partial class ToolManager : ObservableObject
             List<string> dirs = [];
             if (Paths?.Ffmpeg is { } ffmpeg) dirs.Add(Path.GetDirectoryName(ffmpeg)!);
             if (Paths?.JsRuntime is { } js) dirs.Add(Path.GetDirectoryName(js.Path)!);
+            dirs.AddRange(SystemDirectories);
             return dirs;
         }
     }
@@ -140,13 +157,14 @@ public sealed partial class ToolManager : ObservableObject
         if (managed != null && bundledYTDLP != null && BundledYTDLPVersion() is { } bundledTag
             && CompareVersions(Path.GetFileName(Path.GetDirectoryName(managed)!), bundledTag) <= 0)
             managed = null;
-        string? ytdlp = managed ?? bundledYTDLP ?? FindOnPath(YtdlpExe);
+        // PATH에는 묶음 이름(yt-dlp_macos)이 아니라 yt-dlp로 설치돼 있습니다(Homebrew 등).
+        string? ytdlp = managed ?? bundledYTDLP ?? FindOnPath(Exe("yt-dlp"));
         if (ytdlp == null) return null;
 
-        string? Find(string name) => Existing(Path.Combine(bundled, name)) ?? FindOnPath(name);
-        (string, string)? js = Find("deno.exe") is { } deno ? ("deno", deno)
-            : Find("node.exe") is { } node ? ("node", node) : null;
-        return new ToolPaths(ytdlp, Find("ffmpeg.exe"), js);
+        string? Find(string name) => Existing(Path.Combine(bundled, Exe(name))) ?? FindOnPath(Exe(name));
+        (string, string)? js = Find("deno") is { } deno ? ("deno", deno)
+            : Find("node") is { } node ? ("node", node) : null;
+        return new ToolPaths(ytdlp, Find("ffmpeg"), js);
     }
 
     /// <summary>빌드 스크립트가 번들 yt-dlp 옆에 남긴 버전(태그).</summary>
@@ -168,6 +186,7 @@ public sealed partial class ToolManager : ObservableObject
     private static string? FindOnPath(string name) =>
         (System.Environment.GetEnvironmentVariable("PATH") ?? "")
             .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Concat(SystemDirectories)
             .Select(dir => Existing(Path.Combine(dir.Trim('"'), name)))
             .FirstOrDefault(path => path != null);
 
@@ -279,8 +298,8 @@ public sealed partial class ToolManager : ObservableObject
         throw new HttpRequestException(L.T("The server returned an unexpected response."));
     }
 
-    /// <summary>PyInstaller onedir 묶음(yt-dlp.exe + _internal). 한 파일짜리 yt-dlp.exe보다 매번 시작이 훨씬 빠릅니다.</summary>
-    private static string AssetName() => RuntimeInformation.ProcessArchitecture switch
+    /// <summary>PyInstaller onedir 묶음(yt-dlp.exe + _internal). 한 파일짜리 yt-dlp.exe보다 매번 시작이 훨씬 빠릅니다. 맥 묶음은 유니버설입니다.</summary>
+    internal static string AssetName() => OperatingSystem.IsMacOS() ? "yt-dlp_macos.zip" : RuntimeInformation.ProcessArchitecture switch
     {
         Architecture.Arm64 => "yt-dlp_win_arm64.zip",
         Architecture.X86 => "yt-dlp_win_x86.zip",
@@ -313,6 +332,10 @@ public sealed partial class ToolManager : ObservableObject
             if (!File.Exists(Path.Combine(staging, YtdlpExe)) && Directory.GetFiles(staging, "yt-dlp_*.exe") is [var renamed])
                 File.Move(renamed, Path.Combine(staging, YtdlpExe));
             if (!File.Exists(Path.Combine(staging, YtdlpExe))) throw new InvalidDataException(L.T("The downloaded file is damaged."));
+            // zip에 실행 권한이 빠져 있어도 실행되게 합니다.
+            if (!OperatingSystem.IsWindows())
+                File.SetUnixFileMode(Path.Combine(staging, YtdlpExe), File.GetUnixFileMode(Path.Combine(staging, YtdlpExe))
+                                     | UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
             if (Directory.Exists(target)) Directory.Delete(target, recursive: true);
             Directory.Move(staging, target);
         }

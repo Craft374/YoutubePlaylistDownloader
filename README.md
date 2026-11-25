@@ -1,7 +1,8 @@
 # YouTube Playlist Downloader for macOS & Windows
 
 [shaked6540/YoutubePlaylistDownloader](https://github.com/shaked6540/YoutubePlaylistDownloader)(Windows, WPF)를 포크해 네이티브 앱으로 다시 만든 버전입니다.
-macOS 앱(SwiftUI)은 `MacApp/`에, Windows 앱(WinUI 3, C#)은 `WindowsApp/`에 있습니다. 두 앱의 기능은 같습니다.
+macOS 앱(SwiftUI)은 `MacApp/`에, 데스크톱 앱(Avalonia + Semi, C#)은 `WindowsApp/`에 있습니다. 두 앱의 기능은 같습니다.
+데스크톱 앱은 Windows(x64, Arm64)와 macOS에서 같은 화면으로 돌아갑니다. 예전 WinUI 3 화면(`WindowsApp/App/`)은 더 이상 빌드하지 않습니다.
 다운로드는 [yt-dlp](https://github.com/yt-dlp/yt-dlp)가, 병합·변환은 FFmpeg가 맡습니다.
 
 ## 기능
@@ -61,13 +62,13 @@ open "build/YouTube Playlist Downloader.app"
 ## Windows
 
 Windows 10 1809 이상 또는 Windows 11에서 실행됩니다. x64와 Arm64(Snapdragon PC, Mac의 Parallels 등)용이 따로 있습니다.
-.NET이나 Windows App SDK를 따로 설치할 필요가 없습니다(실행 파일 폴더에 함께 들어 있습니다).
+.NET을 따로 설치할 필요가 없습니다(실행 파일 폴더에 함께 들어 있습니다).
 
 ### 받기
 
 Windows에서 직접 빌드하지 않아도 GitHub Actions가 빌드한 결과물을 받을 수 있습니다.
 
-1. 저장소의 **Actions** → **Windows** 워크플로를 엽니다. `master`에 `WindowsApp/`이 바뀐 커밋을 푸시하면 자동으로 실행되고, **Run workflow**로 직접 실행할 수도 있습니다.
+1. 저장소의 **Actions** → **Desktop** 워크플로를 엽니다. `master`에 `WindowsApp/`이 바뀐 커밋을 푸시하면 자동으로 실행되고, **Run workflow**로 직접 실행할 수도 있습니다.
 2. 끝난 실행 페이지 아래 **Artifacts**에서 `YoutubePlaylistDownloader-win-x64`(ARM PC는 `-win-arm64`)를 받아 압축을 풉니다.
 3. `YoutubePlaylistDownloader\YoutubePlaylistDownloader.exe`를 실행합니다. 폴더째로 원하는 곳에 두면 됩니다(설치 과정 없음).
 
@@ -76,19 +77,20 @@ Windows에서 직접 빌드하지 않아도 GitHub Actions가 빌드한 결과�
 .NET 10 SDK가 필요합니다. Visual Studio는 필요하지 않습니다.
 
 ```powershell
-dotnet publish WindowsApp/App/App.csproj -c Release -r win-x64 -o out/YoutubePlaylistDownloader
+dotnet publish WindowsApp/AvaloniaApp/AvaloniaApp.csproj -c Release -r win-x64 -o out/YoutubePlaylistDownloader
 ```
 
 - 결과는 `out/YoutubePlaylistDownloader`에 생깁니다. 이 폴더 전체가 앱입니다.
-- 게시할 때 yt-dlp, ffmpeg, ffprobe, deno를 받아 `tools\`에 함께 넣습니다. 받은 파일은 `WindowsApp/App/tools-cache`에 저장해 다음 빌드에 다시 씁니다.
+- 게시할 때 yt-dlp, ffmpeg, ffprobe, deno를 받아 `tools\`에 함께 넣습니다. 받은 파일은 `WindowsApp/AvaloniaApp/tools-cache`에 저장해 다음 빌드에 다시 씁니다.
   도구를 새로 받으려면 이 폴더를 지웁니다. 도구 없이 게시하려면 `-p:BundleTools=false`를 붙입니다.
 - Arm64용은 `-r win-arm64`로 게시합니다.
 - Mac의 Parallels Windows VM에 바로 빌드하려면 Mac에서 `WindowsApp/scripts/build-parallels.sh`를 실행합니다.
   VM 안에 .NET 10 SDK를 따로 받아(`%LOCALAPPDATA%\YPDBuild`, 시스템 설치 아님) VM의 `%USERPROFILE%\YoutubePlaylistDownloader`에 빌드하고 시작 메뉴 바로 가기를 만듭니다.
   다시 실행하면 그 폴더를 덮어쓰며 `data`(설정)는 남습니다. VM이 켜져 있어야 하고, 앱은 꺼져 있어야 합니다.
-  이 빌드는 VM 안의 `%LOCALAPPDATA%\YPDBuild\src\App\tools-cache`를 따로 쓰므로, 도구를 새로 받으려면 VM에서 그 폴더를 지웁니다.
+  이 빌드는 VM 안의 `%LOCALAPPDATA%\YPDBuild\src\AvaloniaApp\tools-cache`를 따로 쓰므로, 도구를 새로 받으려면 VM에서 그 폴더를 지웁니다.
 - 로직 테스트는 `dotnet test WindowsApp/Core.Tests`로 실행합니다(macOS에서도 됩니다).
-- macOS에서도 `dotnet build`·`dotnet publish`로 컴파일은 확인할 수 있지만, 실행할 수 있는 앱은 Windows(또는 GitHub Actions)에서 빌드해야 합니다.
+- macOS에서도 `dotnet publish -r win-x64`로 Windows용을 게시할 수 있습니다(실행 파일 아이콘은 Windows에서 빌드할 때만 들어갑니다).
+- 같은 앱의 맥 번들은 Mac에서 `WindowsApp/scripts/build-mac.sh`로 만듭니다(`WindowsApp/bin/mac/osx-arm64/YouTube Playlist Downloader.app`, 인텔 맥은 `ARCH=x86_64`). 도구는 `Contents/Resources/tools`에 들어가고, 설정은 `~/Library/Application Support/YoutubePlaylistDownloader`에 저장합니다.
 
 ### 알아 둘 점
 
@@ -100,8 +102,8 @@ dotnet publish WindowsApp/App/App.csproj -c Release -r win-x64 -o out/YoutubePla
 - macOS 앱과 다른 점:
   - 설정은 따로 창을 띄우지 않고 왼쪽 목록의 한 화면으로 엽니다.
   - 다운로드 목록에서 작업을 펼치면 항목들이 작업 아래의 작은 목록 안에서 따로 스크롤됩니다.
-  - 로고와 제목 영역이 없습니다(화면 제목만 보여 줍니다).
-  - 화면이 바뀔 때 애니메이션이 없고, 끝난 작업의 진행 막대는 초록색이 아니라 강조 색입니다.
+  - 화면이 바뀔 때 짧게 겹쳐 나타나고, 옵션 패널은 오른쪽에서 미끄러져 들어옵니다. OS의 "동작 줄이기"를 켜면 미끄러짐 없이 나타나기만 합니다.
+  - 사이드바는 Windows 11의 Mica(맥은 반투명 재질)를 씁니다. 투명 효과·고대비를 끄면 단색입니다.
   - MP4는 항상 H.264라 최대 1080p입니다(위 참고).
   - 중지하면 yt-dlp에 중단 신호를 보내는 대신 yt-dlp와 ffmpeg 프로세스를 바로 끝냅니다(Windows에는 같은 신호가 없습니다).
   - 파일 이름은 Windows 규칙에 맞게 정리합니다(`< > : " / \ | ? *` 등을 `_`로 바꾸고, `CON`·`NUL` 같은 예약된 이름을 피하며, 경로 길이 제한 때문에 100자까지만 씁니다).
@@ -115,10 +117,12 @@ dotnet publish WindowsApp/App/App.csproj -c Release -r win-x64 -o out/YoutubePla
 | `MacApp/Sources/YoutubePlaylistDownloader/Views` | SwiftUI 화면 |
 | `MacApp/Resources` | Info.plist, 아이콘(SVG/ICNS), 번역 문자열 |
 | `MacApp/scripts` | 앱 번들 빌드, 아이콘 생성 |
-| `WindowsApp/Core` | Windows 앱의 UI와 무관한 로직과 서비스(`YPDCore`와 Services를 옮긴 것, 번역 문자열 포함) |
+| `WindowsApp/Core` | 데스크톱 앱의 UI와 무관한 로직과 서비스(`YPDCore`와 Services를 옮긴 것, 번역 문자열 포함) |
 | `WindowsApp/Core.Tests` | `Core` 테스트(xunit) |
-| `WindowsApp/App` | WinUI 3 화면(XAML 없이 C# 코드로 작성), 아이콘, 도구 동봉(`App.csproj`의 `BundleTools`) |
-| `.github/workflows/windows.yml` | Windows 앱 테스트·빌드(GitHub Actions) |
+| `WindowsApp/AvaloniaApp` | Avalonia + Semi 화면(Windows·macOS 공용), 도구 동봉(`AvaloniaApp.csproj`의 `BundleTools`) |
+| `WindowsApp/App` | 예전 WinUI 3 화면(빌드하지 않음), 아이콘 |
+| `WindowsApp/scripts` | Parallels VM 빌드, 맥 번들 빌드(`build-mac.sh`) |
+| `.github/workflows/windows.yml` | 데스크톱 앱 테스트·빌드(Windows x64·Arm64, macOS, GitHub Actions) |
 
 ## 라이선스
 

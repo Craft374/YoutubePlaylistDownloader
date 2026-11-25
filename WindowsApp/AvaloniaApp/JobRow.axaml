@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:YPD.Desktop"
+             x:Class="YPD.Desktop.JobRow">
+  <!-- 작업 한 줄: 썸네일, 제목, 상태, 진행 막대, 버튼. 펼치면 아래에 항목 목록과 실패 목록 복사·저장 버튼이 붙습니다. -->
+  <Border Classes="card" Padding="12" Margin="0,0,0,10">
+    <StackPanel>
+      <Grid Name="Header" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Background="Transparent">
+        <Grid.ContextMenu>
+          <ContextMenu>
+            <MenuItem Name="MenuFolder" />
+            <MenuItem Name="MenuRetry" Header="{local:Tr 'Retry Failed'}" />
+            <MenuItem Name="MenuStop" Header="{local:Tr 'Stop'}" />
+            <Separator />
+            <MenuItem Name="MenuRemove" Header="{local:Tr 'Remove'}" />
+          </ContextMenu>
+        </Grid.ContextMenu>
+        <Border Width="112" Height="63" CornerRadius="8" ClipToBounds="True" Background="{DynamicResource YpdSegmentTrack}" VerticalAlignment="Center">
+          <Panel>
+            <local:Icon Data="{StaticResource IconPlay}" Classes="tertiary" Width="20" Height="20" />
+            <Image Name="Thumbnail" Stretch="UniformToFill" />
+          </Panel>
+        </Border>
+        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+          <TextBlock Name="TitleText" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+          <TextBlock Name="StatusText" Classes="secondary" FontSize="12" TextTrimming="CharacterEllipsis" />
+          <TextBlock Name="CurrentText" Classes="tertiary" FontSize="12" TextTrimming="CharacterEllipsis" />
+          <ProgressBar Name="Progress" Maximum="1" Margin="0,6,0,0" />
+        </StackPanel>
+        <!-- 버튼을 빠르게 두 번 눌러도 줄의 두 번 누르기(폴더 열기)로 번지지 않게 합니다(JobRow.axaml.cs). -->
+        <StackPanel Name="Buttons" Grid.Column="2" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+          <Button Name="ExpandButton" Classes="icon">
+            <local:Icon Name="ExpandIcon" Width="16" Height="16" />
+          </Button>
+          <Button Name="FolderButton" Classes="icon">
+            <local:Icon Data="{StaticResource IconFolder}" Width="16" Height="16" />
+          </Button>
+          <Button Name="StopButton" Classes="icon" ToolTip.Tip="{local:Tr 'Stop'}" AutomationProperties.Name="{local:Tr 'Stop'}">
+            <local:Icon Data="{StaticResource IconStop}" Width="16" Height="16" />
+          </Button>
+          <Button Name="RetryButton" Classes="icon" ToolTip.Tip="{local:Tr 'Retry failed downloads'}" AutomationProperties.Name="{local:Tr 'Retry failed downloads'}">
+            <local:Icon Data="{StaticResource IconRetry}" Width="16" Height="16" />
+          </Button>
+          <Button Name="RemoveButton" Classes="icon" ToolTip.Tip="{local:Tr 'Remove from list'}" AutomationProperties.Name="{local:Tr 'Remove from list'}">
+            <local:Icon Data="{StaticResource IconTrash}" Width="16" Height="16" />
+          </Button>
+        </StackPanel>
+      </Grid>
+
+      <StackPanel Name="Details" Spacing="6" Margin="0,12,0,0" IsVisible="False">
+        <Border Height="1" Background="{DynamicResource YpdDivider}" />
+        <!-- 항목이 수천 개여도 버벅이지 않게, 높이를 제한한 안쪽 목록이 보이는 항목만 만듭니다. -->
+        <ScrollViewer MaxHeight="360" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl Name="Items">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <VirtualizingStackPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </ScrollViewer>
+        <StackPanel Name="FailureActions" Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+          <Button Name="CopyErrors" Content="{local:Tr 'Copy Error List'}" />
+          <Button Name="SaveErrors" Content="{local:Tr 'Save Error List…'}" />
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</UserControl>

@@ -33,9 +33,10 @@ if (Get-Process YoutubePlaylistDownloader -ErrorAction SilentlyContinue) {
     throw '앱이 실행 중이라 파일을 덮어쓸 수 없습니다. 앱을 끄고 다시 실행하십시오.'
 }
 
-& $dotnet publish (Join-Path $src 'App\App.csproj') -c Release -r $rid -o $out
+# 예전(WinUI) 게시 파일이 섞이지 않게 data(설정·로그) 말고는 비우고 새로 게시합니다(tools는 캐시에서 다시 풉니다).
+if (Test-Path $out) { Get-ChildItem $out -Exclude data | Remove-Item -Recurse -Force }
+& $dotnet publish (Join-Path $src 'AvaloniaApp\AvaloniaApp.csproj') -c Release -r $rid -o $out
 if ($LASTEXITCODE -ne 0) { throw "빌드 실패(dotnet publish $LASTEXITCODE)" }
-if (!(Test-Path (Join-Path $out 'YoutubePlaylistDownloader.pri'))) { throw 'YoutubePlaylistDownloader.pri가 없습니다. 이대로는 앱이 켜지지 않습니다.' }
 
 $exe = Join-Path $out 'YoutubePlaylistDownloader.exe'
 $link = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path ([Environment]::GetFolderPath('Programs')) 'YouTube Playlist Downloader.lnk'))

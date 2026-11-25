@@ -3,12 +3,11 @@
              xmlns:local="using:YPD.Desktop"
              x:Class="YPD.Desktop.NewDownloadView">
   <ScrollViewer>
-    <StackPanel MaxWidth="640" Margin="32,36,32,32" Spacing="24">
+    <StackPanel MaxWidth="640" Margin="32,16,32,32" Spacing="24">
 
-      <!-- 로고, 제목, 설명(Mac NewDownloadView와 같은 배치) -->
-      <StackPanel Spacing="8">
+      <!-- 로고와 설명(화면 제목은 머리글에 있습니다) -->
+      <StackPanel Spacing="14">
         <local:Logo HorizontalAlignment="Center" />
-        <TextBlock Classes="hero" Text="{local:Tr 'New Download'}" Margin="0,6,0,0" />
         <TextBlock Classes="secondary" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
                    Text="{local:Tr 'Paste a link to a YouTube video, playlist or channel'}" />
       </StackPanel>
@@ -35,7 +34,7 @@
         <TextBlock Name="Invalid" Classes="secondary" HorizontalAlignment="Center" Text="{local:Tr 'This doesn’t look like a link'}" />
 
         <StackPanel Name="Added" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-          <local:Icon Data="{StaticResource IconCheckCircle}" Stroke="#2EBD6B" />
+          <local:Icon Data="{StaticResource IconCheckCircle}" Classes="success" />
           <TextBlock Text="{local:Tr 'Added to Downloads'}" VerticalAlignment="Center" />
         </StackPanel>
 
@@ -48,7 +47,7 @@
         <!-- 조회 실패 -->
         <Border Name="Failure" Classes="card" Padding="16">
           <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-            <local:Icon Data="{StaticResource IconAlert}" Stroke="#F5A524" Width="20" Height="20" VerticalAlignment="Top" />
+            <local:Icon Data="{StaticResource IconAlert}" Classes="warning" Width="20" Height="20" VerticalAlignment="Top" />
             <StackPanel Grid.Column="1" Spacing="12">
               <SelectableTextBlock Name="FailureText" TextWrapping="Wrap" />
               <Button Name="RetryButton" Content="{local:Tr 'Try Again'}" />
@@ -62,7 +61,7 @@
             <!-- 좁은 창(옵션 패널을 연 최소 폭)에서는 썸네일이 줄어 제목 자리가 남습니다. -->
             <Grid ColumnDefinitions="2*,3*" ColumnSpacing="16">
               <Viewbox Stretch="Uniform" StretchDirection="DownOnly" MaxWidth="208" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Border Width="208" Height="117" CornerRadius="8" ClipToBounds="True" Background="{DynamicResource YpdSegmentTrack}">
+                <Border Width="208" Height="117" CornerRadius="10" ClipToBounds="True" Background="{DynamicResource YpdSegmentTrack}">
                   <Panel>
                     <local:Icon Data="{StaticResource IconPlay}" Width="28" Height="28" Stroke="{DynamicResource YpdTextTertiary}" />
                     <Image Name="Thumbnail" Stretch="UniformToFill" />
@@ -73,7 +72,7 @@
                 <Border Background="{DynamicResource YpdAccentSoft}" CornerRadius="10" Padding="8,2" HorizontalAlignment="Left">
                   <TextBlock Name="KindText" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource YpdAccent}" />
                 </Border>
-                <TextBlock Name="TitleText" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                <TextBlock Name="TitleText" FontSize="17" FontWeight="SemiBold" LetterSpacing="-0.2" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
                 <TextBlock Name="UploaderText" Classes="secondary" />
                 <TextBlock Name="DetailText" Classes="secondary" />
                 <StackPanel Name="FilterRow" Spacing="2">
@@ -84,7 +83,7 @@
                 </StackPanel>
               </StackPanel>
             </Grid>
-            <TextBlock Name="EnqueueError" Classes="caption" Foreground="#E5484D" IsVisible="False" />
+            <TextBlock Name="EnqueueError" Classes="caption danger" IsVisible="False" />
             <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
               <Button Name="AddButton" Content="{local:Tr 'Add to Queue'}" />
               <Button Name="DownloadButton" Classes="brand" Content="{local:Tr 'Download'}" />
