@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:YPD.Desktop"
+             x:Class="YPD.Desktop.NewDownloadView">
+  <ScrollViewer>
+    <StackPanel MaxWidth="640" Margin="32,36,32,32" Spacing="24">
+
+      <!-- 로고, 제목, 설명(Mac NewDownloadView와 같은 배치) -->
+      <StackPanel Spacing="8">
+        <local:Logo HorizontalAlignment="Center" />
+        <TextBlock Classes="hero" Text="{local:Tr 'New Download'}" Margin="0,6,0,0" />
+        <TextBlock Classes="secondary" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
+                   Text="{local:Tr 'Paste a link to a YouTube video, playlist or channel'}" />
+      </StackPanel>
+
+      <!-- 링크 입력칸: 테마의 TextBox 안쪽 왼쪽에 링크 아이콘, 오른쪽에 지우기·붙여넣기 -->
+      <TextBox Name="Box" PlaceholderText="{local:Tr 'Paste a link'}" FontSize="16" MinHeight="52" CornerRadius="12"
+               VerticalContentAlignment="Center">
+        <TextBox.InnerLeftContent>
+          <local:Icon Data="{StaticResource IconLink}" Margin="14,0,4,0" />
+        </TextBox.InnerLeftContent>
+        <TextBox.InnerRightContent>
+          <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
+            <Button Name="ClearButton" Classes="icon" ToolTip.Tip="{local:Tr 'Clear'}">
+              <local:Icon Data="{StaticResource IconClose}" Width="16" Height="16" />
+            </Button>
+            <Button Name="PasteButton" Classes="icon" ToolTip.Tip="{local:Tr 'Paste from clipboard'}">
+              <local:Icon Data="{StaticResource IconClipboard}" />
+            </Button>
+          </StackPanel>
+        </TextBox.InnerRightContent>
+      </TextBox>
+
+      <StackPanel Spacing="12">
+        <TextBlock Name="Invalid" Classes="secondary" HorizontalAlignment="Center" Text="{local:Tr 'This doesn’t look like a link'}" />
+
+        <StackPanel Name="Added" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+          <local:Icon Data="{StaticResource IconCheckCircle}" Stroke="#2EBD6B" />
+          <TextBlock Text="{local:Tr 'Added to Downloads'}" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Name="Resolving" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+          <ProgressBar IsIndeterminate="True" Width="120" VerticalAlignment="Center" />
+          <TextBlock Classes="secondary" Text="{local:Tr 'Looking up…'}" VerticalAlignment="Center" />
+          <Button Name="CancelButton" Content="{local:Tr 'Cancel'}" />
+        </StackPanel>
+
+        <!-- 조회 실패 -->
+        <Border Name="Failure" Classes="card" Padding="16">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <local:Icon Data="{StaticResource IconAlert}" Stroke="#F5A524" Width="20" Height="20" VerticalAlignment="Top" />
+            <StackPanel Grid.Column="1" Spacing="12">
+              <SelectableTextBlock Name="FailureText" TextWrapping="Wrap" />
+              <Button Name="RetryButton" Content="{local:Tr 'Try Again'}" />
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- 조회 결과 -->
+        <Border Name="Result" Classes="card" Padding="16">
+          <StackPanel Spacing="16">
+            <!-- 좁은 창(옵션 패널을 연 최소 폭)에서는 썸네일이 줄어 제목 자리가 남습니다. -->
+            <Grid ColumnDefinitions="2*,3*" ColumnSpacing="16">
+              <Viewbox Stretch="Uniform" StretchDirection="DownOnly" MaxWidth="208" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Width="208" Height="117" CornerRadius="8" ClipToBounds="True" Background="{DynamicResource YpdSegmentTrack}">
+                  <Panel>
+                    <local:Icon Data="{StaticResource IconPlay}" Width="28" Height="28" Stroke="{DynamicResource YpdTextTertiary}" />
+                    <Image Name="Thumbnail" Stretch="UniformToFill" />
+                  </Panel>
+                </Border>
+              </Viewbox>
+              <StackPanel Grid.Column="1" Spacing="6">
+                <Border Background="{DynamicResource YpdAccentSoft}" CornerRadius="10" Padding="8,2" HorizontalAlignment="Left">
+                  <TextBlock Name="KindText" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource YpdAccent}" />
+                </Border>
+                <TextBlock Name="TitleText" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                <TextBlock Name="UploaderText" Classes="secondary" />
+                <TextBlock Name="DetailText" Classes="secondary" />
+                <StackPanel Name="FilterRow" Spacing="2">
+                  <TextBlock Name="FilterNote" Classes="caption" />
+                  <Button Name="FilterOptions" Classes="icon" Padding="0">
+                    <TextBlock Text="{local:Tr 'Options…'}" FontSize="12" Foreground="{DynamicResource YpdAccent}" />
+                  </Button>
+                </StackPanel>
+              </StackPanel>
+            </Grid>
+            <TextBlock Name="EnqueueError" Classes="caption" Foreground="#E5484D" IsVisible="False" />
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+              <Button Name="AddButton" Content="{local:Tr 'Add to Queue'}" />
+              <Button Name="DownloadButton" Classes="brand" Content="{local:Tr 'Download'}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

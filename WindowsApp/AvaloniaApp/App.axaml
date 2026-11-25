@@ -1,0 +1,204 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:YPD.Desktop"
+             x:Class="YPD.Desktop.App"
+             RequestedThemeVariant="Default">
+  <!-- 컨트롤 테마(SukiUI 또는 Semi)는 App.axaml.cs가 Styles 맨 앞에 넣습니다.
+       여기 있는 색·모양은 앱 고유의 것(배경, 사이드바, 카드, 아이콘)이라 어느 테마에서나 같습니다. -->
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="YpdWindowBackground" Color="#F7F7F9" />
+          <SolidColorBrush x:Key="YpdSidebarBackground" Color="#EFEFF3" />
+          <SolidColorBrush x:Key="YpdCardBackground" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="YpdCardBorder" Color="#E3E3E8" />
+          <SolidColorBrush x:Key="YpdDivider" Color="#EBEBEF" />
+          <SolidColorBrush x:Key="YpdTextSecondary" Color="#6C6C74" />
+          <SolidColorBrush x:Key="YpdTextTertiary" Color="#A3A3AB" />
+          <SolidColorBrush x:Key="YpdHover" Color="#0C000000" />
+          <SolidColorBrush x:Key="YpdNavSelected" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="YpdSegmentTrack" Color="#E9E9EE" />
+          <SolidColorBrush x:Key="YpdSegmentThumb" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="YpdAccentSoft" Color="#1AE5306B" />
+          <BoxShadows x:Key="YpdRaised">0 1 3 0 #1F000000</BoxShadows>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="YpdWindowBackground" Color="#17171A" />
+          <SolidColorBrush x:Key="YpdSidebarBackground" Color="#1E1E22" />
+          <SolidColorBrush x:Key="YpdCardBackground" Color="#222227" />
+          <SolidColorBrush x:Key="YpdCardBorder" Color="#2F2F35" />
+          <SolidColorBrush x:Key="YpdDivider" Color="#2B2B31" />
+          <SolidColorBrush x:Key="YpdTextSecondary" Color="#A2A2AC" />
+          <SolidColorBrush x:Key="YpdTextTertiary" Color="#6A6A74" />
+          <SolidColorBrush x:Key="YpdHover" Color="#12FFFFFF" />
+          <SolidColorBrush x:Key="YpdNavSelected" Color="#2B2B31" />
+          <SolidColorBrush x:Key="YpdSegmentTrack" Color="#151518" />
+          <SolidColorBrush x:Key="YpdSegmentThumb" Color="#34343B" />
+          <SolidColorBrush x:Key="YpdAccentSoft" Color="#2EFF6A5C" />
+          <BoxShadows x:Key="YpdRaised">0 1 3 0 #66000000</BoxShadows>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+
+      <!-- 로고 색(MacApp LogoView와 같음). -->
+      <SolidColorBrush x:Key="YpdAccent" Color="#E5306B" />
+      <LinearGradientBrush x:Key="YpdBrandGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="#FF6A5C" Offset="0" />
+        <GradientStop Color="#E5306B" Offset="1" />
+      </LinearGradientBrush>
+
+      <!-- 선 아이콘(24×24 격자, 굵기 2, 둥근 끝). local:Icon이 그립니다. -->
+      <StreamGeometry x:Key="IconLink">M10 13 A5 5 0 0 0 17.54 13.54 L20.54 10.54 A5 5 0 0 0 13.47 3.47 L11.75 5.18 M14 11 A5 5 0 0 0 6.46 10.46 L3.46 13.46 A5 5 0 0 0 10.53 20.53 L12.24 18.82</StreamGeometry>
+      <StreamGeometry x:Key="IconList">M8 6 L21 6 M8 12 L21 12 M8 18 L21 18 M3 6 L3.01 6 M3 12 L3.01 12 M3 18 L3.01 18</StreamGeometry>
+      <StreamGeometry x:Key="IconDownload">M21 15 L21 19 A2 2 0 0 1 19 21 L5 21 A2 2 0 0 1 3 19 L3 15 M7 10 L12 15 L17 10 M12 15 L12 3</StreamGeometry>
+      <StreamGeometry x:Key="IconSettings">M12 9 A3 3 0 1 1 12 15 A3 3 0 1 1 12 9 Z M12 2 L12 4.5 M12 19.5 L12 22 M2 12 L4.5 12 M19.5 12 L22 12 M4.93 4.93 L6.7 6.7 M17.3 17.3 L19.07 19.07 M4.93 19.07 L6.7 17.3 M17.3 6.7 L19.07 4.93 M12 5 A7 7 0 1 1 12 19 A7 7 0 1 1 12 5 Z</StreamGeometry>
+      <StreamGeometry x:Key="IconSliders">M4 21 L4 14 M4 10 L4 3 M12 21 L12 12 M12 8 L12 3 M20 21 L20 16 M20 12 L20 3 M1 14 L7 14 M9 8 L15 8 M17 16 L23 16</StreamGeometry>
+      <StreamGeometry x:Key="IconClipboard">M16 4 L18 4 A2 2 0 0 1 20 6 L20 20 A2 2 0 0 1 18 22 L6 22 A2 2 0 0 1 4 20 L4 6 A2 2 0 0 1 6 4 L8 4 M9 2 L15 2 A1 1 0 0 1 16 3 L16 5 A1 1 0 0 1 15 6 L9 6 A1 1 0 0 1 8 5 L8 3 A1 1 0 0 1 9 2 Z</StreamGeometry>
+      <StreamGeometry x:Key="IconClose">M18 6 L6 18 M6 6 L18 18</StreamGeometry>
+      <StreamGeometry x:Key="IconCheckCircle">M22 11.08 L22 12 A10 10 0 1 1 16.07 2.86 M22 4 L12 14.01 L9 11.01</StreamGeometry>
+      <StreamGeometry x:Key="IconAlert">M10.29 3.86 L1.82 18 A2 2 0 0 0 3.53 21 L20.47 21 A2 2 0 0 0 22.18 18 L13.71 3.86 A2 2 0 0 0 10.29 3.86 Z M12 9 L12 13 M12 17 L12.01 17</StreamGeometry>
+      <StreamGeometry x:Key="IconFolder">M22 19 A2 2 0 0 1 20 21 L4 21 A2 2 0 0 1 2 19 L2 5 A2 2 0 0 1 4 3 L9 3 L11 6 L20 6 A2 2 0 0 1 22 8 Z</StreamGeometry>
+      <StreamGeometry x:Key="IconReset">M1 4 L1 10 L7 10 M3.51 15 A9 9 0 1 0 5.64 5.64 L1 10</StreamGeometry>
+      <StreamGeometry x:Key="IconPlus">M12 5 L12 19 M5 12 L19 12</StreamGeometry>
+      <StreamGeometry x:Key="IconMoon">M21 12.79 A9 9 0 1 1 11.21 3 A7 7 0 0 0 21 12.79 Z</StreamGeometry>
+      <StreamGeometry x:Key="IconPlay">M5 3 L19 12 L5 21 Z</StreamGeometry>
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <!-- 글 -->
+    <Style Selector="TextBlock.secondary">
+      <Setter Property="Foreground" Value="{DynamicResource YpdTextSecondary}" />
+    </Style>
+    <Style Selector="TextBlock.caption">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Foreground" Value="{DynamicResource YpdTextSecondary}" />
+    </Style>
+    <Style Selector="TextBlock.hero">
+      <Setter Property="FontSize" Value="28" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBlock.section">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="4,18,0,8" />
+    </Style>
+    <Style Selector="TextBlock.rowLabel">
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- 카드와 카드 안의 줄 -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{DynamicResource YpdCardBackground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource YpdCardBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="12" />
+    </Style>
+    <Style Selector="Border.row">
+      <Setter Property="Padding" Value="14,10" />
+      <Setter Property="MinHeight" Value="46" />
+    </Style>
+    <!-- 줄 사이 구분선: 카드 안 줄마다 위에 선을 긋고, 보이는 첫 줄만 OptionsPanel이 지웁니다. -->
+    <Style Selector="Border.row.divided">
+      <Setter Property="BorderBrush" Value="{DynamicResource YpdDivider}" />
+      <Setter Property="BorderThickness" Value="0,1,0,0" />
+    </Style>
+
+    <!-- 선 아이콘 -->
+    <Style Selector="local|Icon">
+      <Setter Property="Stroke" Value="{DynamicResource YpdTextSecondary}" />
+    </Style>
+
+    <!-- 사이드바 항목: 테마와 상관없이 같은 모양(둥근 알약, 선택하면 아이콘이 로고 색). -->
+    <Style Selector="RadioButton.nav">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="bg" Background="Transparent" CornerRadius="8" Padding="10,8">
+            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="RadioButton.nav:pointerover /template/ Border#bg">
+      <Setter Property="Background" Value="{DynamicResource YpdHover}" />
+    </Style>
+    <Style Selector="RadioButton.nav:checked /template/ Border#bg">
+      <Setter Property="Background" Value="{DynamicResource YpdNavSelected}" />
+      <Setter Property="BoxShadow" Value="{DynamicResource YpdRaised}" />
+    </Style>
+    <Style Selector="RadioButton.nav:checked local|Icon">
+      <Setter Property="Stroke" Value="{DynamicResource YpdAccent}" />
+    </Style>
+    <Style Selector="RadioButton.nav:checked TextBlock">
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- 세그먼트(동영상/오디오/원본 오디오): 홈 안에서 고른 칸만 떠오릅니다. -->
+    <Style Selector="RadioButton.segment">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="bg" Background="Transparent" CornerRadius="7" Padding="6,6">
+            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="RadioButton.segment:pointerover /template/ Border#bg">
+      <Setter Property="Background" Value="{DynamicResource YpdHover}" />
+    </Style>
+    <Style Selector="RadioButton.segment:checked /template/ Border#bg">
+      <Setter Property="Background" Value="{DynamicResource YpdSegmentThumb}" />
+      <Setter Property="BoxShadow" Value="{DynamicResource YpdRaised}" />
+    </Style>
+    <Style Selector="RadioButton.segment:checked TextBlock">
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- 로고 색 버튼(다운로드). 테마마다 강조 버튼 이름이 달라 직접 그립니다. -->
+    <Style Selector="Button.brand">
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="bg" Background="{DynamicResource YpdBrandGradient}" CornerRadius="8" Padding="18,8">
+            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                              Foreground="{TemplateBinding Foreground}" FontWeight="SemiBold" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.brand:pointerover /template/ Border#bg">
+      <Setter Property="Opacity" Value="0.9" />
+    </Style>
+    <Style Selector="Button.brand:pressed /template/ Border#bg">
+      <Setter Property="Opacity" Value="0.75" />
+    </Style>
+    <Style Selector="Button.brand:disabled /template/ Border#bg">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+
+    <!-- 테두리 없는 아이콘 버튼(붙여넣기, 지우기 등) -->
+    <Style Selector="Button.icon">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Padding" Value="6" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="bg" Background="Transparent" CornerRadius="6" Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.icon:pointerover /template/ Border#bg">
+      <Setter Property="Background" Value="{DynamicResource YpdHover}" />
+    </Style>
+  </Application.Styles>
+</Application>

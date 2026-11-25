@@ -1,0 +1,213 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:YPD.Desktop"
+             x:Class="YPD.Desktop.OptionsPanel">
+  <!-- 다운로드 옵션(Mac OptionsInspector): 구역 제목 → 카드 → "왼쪽 이름, 오른쪽 컨트롤" 줄. -->
+  <UserControl.Styles>
+    <Style Selector="ComboBox">
+      <Setter Property="MinWidth" Value="110" />
+      <Setter Property="MaxWidth" Value="140" />
+      <!-- 긴 언어 이름("Norwegian Bokmål")은 말줄임표로 자릅니다. -->
+      <Setter Property="ItemTemplate">
+        <DataTemplate x:DataType="x:String">
+          <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" />
+        </DataTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="ToggleSwitch">
+      <Setter Property="OnContent" Value="" />
+      <Setter Property="OffContent" Value="" />
+      <Setter Property="MinWidth" Value="0" />
+    </Style>
+    <Style Selector="NumericUpDown">
+      <Setter Property="Width" Value="110" />
+      <Setter Property="FormatString" Value="0" />
+    </Style>
+  </UserControl.Styles>
+  <UserControl.Resources>
+    <!-- Semi의 ToggleSwitch는 빈 글 칸에도 좌우 8px을 남겨 오른쪽 끝이 콤보 상자와 어긋납니다. -->
+    <Thickness x:Key="ToggleSwitchOnContentMargin">0</Thickness>
+  </UserControl.Resources>
+
+  <Border Background="{DynamicResource YpdSidebarBackground}" BorderBrush="{DynamicResource YpdDivider}" BorderThickness="1,0,0,0">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Name="Body" Margin="16,8,16,20">
+
+        <!-- 형식 -->
+        <TextBlock Classes="section" Text="{local:Tr 'Format'}" Margin="4,4,0,8" />
+        <Border Classes="card" Padding="10">
+          <StackPanel Spacing="10">
+            <Border Background="{DynamicResource YpdSegmentTrack}" CornerRadius="9" Padding="2">
+              <!-- "원본 오디오"가 1/3 칸에 들어가지 않아 그 칸만 글 폭을 씁니다. -->
+              <Grid ColumnDefinitions="*,*,Auto">
+                <RadioButton Name="ModeVideo" Classes="segment" GroupName="mode" Content="{local:Tr 'Video'}" />
+                <RadioButton Name="ModeAudio" Grid.Column="1" Classes="segment" GroupName="mode" Content="{local:Tr 'Audio'}" />
+                <RadioButton Name="ModeOriginal" Grid.Column="2" Classes="segment" GroupName="mode" Content="{local:Tr 'Original Audio'}" />
+              </Grid>
+            </Border>
+            <TextBlock Name="ModeDescription" Classes="caption" Margin="4,0" />
+          </StackPanel>
+        </Border>
+
+        <!-- 동영상 또는 오디오: 모드에 따라 줄을 숨깁니다 -->
+        <TextBlock Name="MediaHeader" Classes="section" />
+        <Border Classes="card">
+          <StackPanel Name="MediaRows">
+            <Border Name="ContainerRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Container'}" />
+                <ComboBox Name="Container" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Container'}" />
+              </Grid>
+            </Border>
+            <Border Name="MaxHeightRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Max resolution'}" />
+                <ComboBox Name="MaxHeightBox" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Max resolution'}" />
+              </Grid>
+            </Border>
+            <Border Name="PreferFpsRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Prefer higher frame rate'}" />
+                <ToggleSwitch Name="PreferFps" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Prefer higher frame rate'}" />
+              </Grid>
+            </Border>
+            <Border Name="SubtitlesRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Download subtitles'}" />
+                <ToggleSwitch Name="Subtitles" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Download subtitles'}" />
+              </Grid>
+            </Border>
+            <Border Name="SubtitleLanguageRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Subtitle language'}" />
+                <ComboBox Name="SubtitleLanguage" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Subtitle language'}" />
+              </Grid>
+            </Border>
+            <Border Name="AudioFormatRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Format'}" />
+                <ComboBox Name="AudioFormatBox" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Format'}" />
+              </Grid>
+            </Border>
+            <Border Name="SetBitrateRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Set bitrate'}" />
+                <ToggleSwitch Name="SetBitrate" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Set bitrate'}" />
+              </Grid>
+            </Border>
+            <Border Name="BitrateRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Bitrate'}" />
+                <ComboBox Name="Bitrate" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Bitrate'}" />
+              </Grid>
+            </Border>
+            <Border Name="TagAudioRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Add tags and cover art'}" ToolTip.Tip="{local:Tr 'Artist and title are read from the video title'}" />
+                <ToggleSwitch Name="TagAudio" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Add tags and cover art'}" />
+              </Grid>
+            </Border>
+            <Border Name="AudioLanguageRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Audio language'}" />
+                <ComboBox Name="AudioLanguage" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Audio language'}" />
+              </Grid>
+            </Border>
+          </StackPanel>
+        </Border>
+        <TextBlock Name="MediaFooter" Classes="caption" Margin="4,6,4,0" />
+
+        <!-- 파일 -->
+        <TextBlock Classes="section" Text="{local:Tr 'Files'}" />
+        <Border Classes="card">
+          <StackPanel Name="FileRows">
+            <Border Classes="row">
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <local:Icon Data="{StaticResource IconFolder}" Stroke="{DynamicResource YpdAccent}" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                  <TextBlock Name="FolderName" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Name="FolderPath" Classes="caption" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <Button Name="ChooseFolder" Grid.Column="2" Content="{local:Tr 'Choose…'}" VerticalAlignment="Center" />
+              </Grid>
+            </Border>
+            <Border Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Save each playlist in its own folder'}" />
+                <ToggleSwitch Name="Subfolders" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Save each playlist in its own folder'}" />
+              </Grid>
+            </Border>
+            <Border Classes="row">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{local:Tr 'File name'}" />
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
+                  <TextBox Name="Pattern" FontFamily="Cascadia Mono, Consolas, Menlo, monospace" AutomationProperties.Name="{local:Tr 'File name'}" />
+                  <Button Name="ResetPattern" Grid.Column="1" Classes="icon" VerticalAlignment="Center" ToolTip.Tip="{local:Tr 'Reset to $title'}">
+                    <local:Icon Data="{StaticResource IconReset}" Width="16" Height="16" />
+                  </Button>
+                  <Button Name="InsertToken" Grid.Column="2" Classes="icon" VerticalAlignment="Center" ToolTip.Tip="{local:Tr 'Insert a token'}">
+                    <local:Icon Data="{StaticResource IconPlus}" Width="16" Height="16" />
+                  </Button>
+                </Grid>
+                <TextBlock Name="Example" Classes="caption" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Border>
+            <Border Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Skip files that already exist'}" />
+                <ToggleSwitch Name="SkipExisting" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Skip files that already exist'}" />
+              </Grid>
+            </Border>
+            <Border Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Open folder when done'}" />
+                <ToggleSwitch Name="OpenFolder" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Open folder when done'}" />
+              </Grid>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <!-- 재생목록 -->
+        <TextBlock Classes="section" Text="{local:Tr 'Playlist'}" />
+        <Border Classes="card">
+          <StackPanel Name="PlaylistRows">
+            <Border Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Only download a range'}" />
+                <ToggleSwitch Name="UseRange" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Only download a range'}" />
+              </Grid>
+            </Border>
+            <Border Name="RangeStartRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'From'}" />
+                <NumericUpDown Name="RangeStart" Grid.Column="1" Minimum="1" Maximum="100000" AutomationProperties.Name="{local:Tr 'From'}" />
+              </Grid>
+            </Border>
+            <Border Name="RangeEndRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'To'}" />
+                <NumericUpDown Name="RangeEnd" Grid.Column="1" Minimum="0" Maximum="100000" AutomationProperties.Name="{local:Tr 'To'}" />
+              </Grid>
+            </Border>
+            <Border Classes="row">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <TextBlock Classes="rowLabel" Text="{local:Tr 'Only download videos by length'}" />
+                <ToggleSwitch Name="FilterByLength" Grid.Column="1" AutomationProperties.Name="{local:Tr 'Only download videos by length'}" />
+              </Grid>
+            </Border>
+            <Border Name="LengthRow" Classes="row">
+              <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                <ComboBox Name="FilterLonger" MinWidth="0" HorizontalAlignment="Stretch" AutomationProperties.Name="{local:Tr 'Length'}" />
+                <NumericUpDown Name="FilterMinutes" Grid.Column="1" Minimum="0" Maximum="10000" Width="72" AutomationProperties.Name="{local:Tr 'Minutes'}" />
+                <TextBlock Grid.Column="2" Classes="secondary" Text="{local:Tr 'min'}" VerticalAlignment="Center" />
+              </Grid>
+            </Border>
+          </StackPanel>
+        </Border>
+        <TextBlock Name="RangeFooter" Classes="caption" Margin="4,6,4,0" Text="{local:Tr 'Leave To at 0 to download until the end'}" />
+
+        <Button Name="ResetOptions" Content="{local:Tr 'Reset Options'}" HorizontalAlignment="Right" Margin="0,20,0,0" />
+      </StackPanel>
+    </ScrollViewer>
+  </Border>
+</UserControl>

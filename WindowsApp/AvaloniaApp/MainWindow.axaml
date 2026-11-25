@@ -1,0 +1,96 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:YPD.Desktop"
+        x:Class="YPD.Desktop.MainWindow"
+        Title="{local:Tr 'YouTube Playlist Downloader'}"
+        Icon="avares://YPDDesktop/Assets/AppIcon.ico"
+        Width="1080" Height="700" MinWidth="900" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource YpdWindowBackground}">
+  <!-- 사이드바(220) | 화면 | 옵션 패널(300, 켜고 끔). 맥에서는 제목 표시줄을 화면 안으로 넓혀 한 장으로 보이게 합니다(MainWindow.axaml.cs). -->
+  <Grid ColumnDefinitions="220,*,Auto">
+
+    <!-- 사이드바 -->
+    <Border Background="{DynamicResource YpdSidebarBackground}" BorderBrush="{DynamicResource YpdDivider}" BorderThickness="0,0,1,0">
+      <DockPanel Margin="12,0,12,12">
+        <!-- 맨 위 빈칸은 창 끌기 영역이자 맥의 신호등 버튼 자리입니다. -->
+        <Border Name="SidebarDrag" DockPanel.Dock="Top" Height="44" Background="Transparent" />
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="6,0,0,18">
+          <local:Logo Width="28" Height="28" />
+          <TextBlock Text="YT Downloader" FontWeight="SemiBold" FontSize="15" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- 아래쪽: 테마 바꾸기(시제품 전용), 화면 모드, 도구 안내 -->
+        <StackPanel DockPanel.Dock="Bottom" Spacing="10">
+          <Border Name="ToolBanner" Classes="card" Padding="12,10" IsVisible="False">
+            <StackPanel Spacing="4">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <local:Icon Data="{StaticResource IconAlert}" Width="14" Height="14" Stroke="#F5A524" />
+                <TextBlock Name="ToolBannerTitle" FontSize="12" FontWeight="SemiBold" />
+              </StackPanel>
+              <TextBlock Name="ToolBannerText" Classes="caption" />
+            </StackPanel>
+          </Border>
+          <TextBlock Name="ThemeLabel" Classes="caption" Margin="4,0,0,0" />
+          <Border Background="{DynamicResource YpdSegmentTrack}" BorderBrush="{DynamicResource YpdCardBorder}" BorderThickness="1" CornerRadius="9" Padding="2">
+            <UniformGrid Columns="2">
+              <RadioButton Name="SukiButton" Classes="segment" GroupName="uiTheme" Content="SukiUI" />
+              <RadioButton Name="SemiButton" Classes="segment" GroupName="uiTheme" Content="Semi" />
+            </UniformGrid>
+          </Border>
+          <Border Background="{DynamicResource YpdSegmentTrack}" BorderBrush="{DynamicResource YpdCardBorder}" BorderThickness="1" CornerRadius="9" Padding="2">
+            <UniformGrid Columns="3">
+              <RadioButton Name="SystemMode" Classes="segment" GroupName="appearance" Content="{local:Tr 'System'}" />
+              <RadioButton Name="LightMode" Classes="segment" GroupName="appearance" Content="{local:Tr 'Light'}" />
+              <RadioButton Name="DarkMode" Classes="segment" GroupName="appearance" Content="{local:Tr 'Dark'}" />
+            </UniformGrid>
+          </Border>
+        </StackPanel>
+
+        <StackPanel Spacing="2">
+          <RadioButton Name="NavNew" Classes="nav" GroupName="nav" IsChecked="True">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <local:Icon Data="{StaticResource IconLink}" />
+              <TextBlock Text="{local:Tr 'New Download'}" VerticalAlignment="Center" />
+            </StackPanel>
+          </RadioButton>
+          <RadioButton Name="NavBulk" Classes="nav" GroupName="nav">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <local:Icon Data="{StaticResource IconList}" />
+              <TextBlock Text="{local:Tr 'Bulk Download'}" VerticalAlignment="Center" />
+            </StackPanel>
+          </RadioButton>
+          <RadioButton Name="NavQueue" Classes="nav" GroupName="nav">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <local:Icon Data="{StaticResource IconDownload}" />
+              <TextBlock Text="{local:Tr 'Downloads'}" VerticalAlignment="Center" />
+            </StackPanel>
+          </RadioButton>
+          <RadioButton Name="NavSettings" Classes="nav" GroupName="nav">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <local:Icon Data="{StaticResource IconSettings}" />
+              <TextBlock Text="{local:Tr 'Settings'}" VerticalAlignment="Center" />
+            </StackPanel>
+          </RadioButton>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <!-- 화면 -->
+    <Grid Grid.Column="1" RowDefinitions="44,*">
+      <Border Name="TopDrag" Background="Transparent">
+        <ToggleButton Name="OptionsToggle" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,6,12,0"
+                      ToolTip.Tip="{local:Tr 'Show or hide download options'}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <local:Icon Data="{StaticResource IconSliders}" Width="16" Height="16" Stroke="{Binding $parent[ToggleButton].Foreground}" />
+            <TextBlock Text="{local:Tr 'Download Options'}" VerticalAlignment="Center" />
+          </StackPanel>
+        </ToggleButton>
+      </Border>
+      <ContentControl Name="PageHost" Grid.Row="1" />
+    </Grid>
+
+    <!-- 옵션 패널 -->
+    <local:OptionsPanel Name="Options" Grid.Column="2" Width="300" IsVisible="False" />
+  </Grid>
+</Window>
