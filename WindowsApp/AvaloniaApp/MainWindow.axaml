@@ -30,6 +30,7 @@
                 <TextBlock Text="{local:Tr 'Components'}" FontSize="12" FontWeight="SemiBold" />
               </StackPanel>
               <TextBlock Name="ToolBannerText" Classes="caption" />
+              <Button Name="InstallYtdlp" Content="{local:Tr 'Install yt-dlp'}" Margin="0,4,0,0" />
             </StackPanel>
           </Border>
           <RadioButton Name="NavSettings" Classes="nav" GroupName="nav">

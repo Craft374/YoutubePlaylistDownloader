@@ -70,7 +70,7 @@ public partial class NewDownloadView : UserControl
             Update();
             // 다른 화면에 있는 동안 옵션 패널에서 필터를 바꿨을 수 있습니다.
             UpdateFilterNote();
-            Box.Focus();
+            Box.Focus(); // 앱을 처음 열 때(돌아올 때는 MainWindow.Show가 FocusLink를 부릅니다)
         };
         DetachedFromVisualTree += (_, _) =>
         {
@@ -79,6 +79,8 @@ public partial class NewDownloadView : UserControl
         };
         Update();
     }
+
+    public void FocusLink() => Box.Focus();
 
     // MARK: 조회
 

@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <AvaloniaResource Include="..\App\Assets\AppIcon.ico" Link="Assets\AppIcon.ico" />
-    <InternalsVisibleTo Include="AvaloniaApp.Tests" />
   </ItemGroup>
 
   <!-- 게시(publish)할 때 yt-dlp·ffmpeg·ffprobe·deno를 받아 tools\에 넣습니다. ToolManager가 찾는 배치와 같습니다.

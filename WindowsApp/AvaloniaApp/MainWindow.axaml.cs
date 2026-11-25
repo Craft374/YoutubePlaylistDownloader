@@ -48,6 +48,7 @@ public partial class MainWindow : Window
         foreach (var (target, item) in navItems)
             item.IsCheckedChanged += (_, _) => { if (item.IsChecked == true) Show(target); };
 
+        InstallYtdlp.Click += async (_, _) => await ToolManager.Shared.UpdateYTDLPAsync(settings);
         OptionsToggle.IsCheckedChanged += (_, _) => AnimateOptions(OptionsToggle.IsChecked == true);
         if (!Motion.Reduced)
             OptionsHost.Transitions = [new Avalonia.Animation.DoubleTransition { Property = WidthProperty, Duration = Motion.Move, Easing = Motion.Spring }];
@@ -96,6 +97,8 @@ public partial class MainWindow : Window
             page.IsVisible = true;
             Motion.FadeIn(page);
         }
+        // 화면은 계속 붙어 있으므로 돌아올 때마다 여기서 링크 칸에 포커스를 줍니다.
+        if (page is NewDownloadView newDownload) newDownload.FocusLink();
         PageTitle.Text = L.T(target switch
         {
             Screen.NewDownload => "New Download",
@@ -186,9 +189,12 @@ public partial class MainWindow : Window
         string? problem = tools.IsChecking ? null
             : !tools.IsReady ? L.T("yt-dlp is not installed.")
             : !tools.HasFFmpeg ? L.T("ffmpeg was not found. Merging and converting will fail.")
+            : tools.JsRuntimeName == null ? L.T("No JavaScript runtime (deno) was found. Some YouTube formats may be missing.")
             : null;
         ToolBanner.IsVisible = problem != null;
         ToolBannerText.Text = problem ?? "";
+        InstallYtdlp.IsVisible = !tools.IsReady;
+        InstallYtdlp.IsEnabled = !tools.IsUpdating;
     }
 
     private void UpdateBadge()

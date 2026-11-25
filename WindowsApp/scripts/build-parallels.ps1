@@ -34,7 +34,7 @@ if (Get-Process YoutubePlaylistDownloader -ErrorAction SilentlyContinue) {
 }
 
 # 예전(WinUI) 게시 파일이 섞이지 않게 data(설정·로그) 말고는 비우고 새로 게시합니다(tools는 캐시에서 다시 풉니다).
-if (Test-Path $out) { Get-ChildItem $out -Exclude data | Remove-Item -Recurse -Force }
+if (Test-Path $out) { Get-ChildItem $out | Where-Object Name -ne 'data' | Remove-Item -Recurse -Force }
 & $dotnet publish (Join-Path $src 'AvaloniaApp\AvaloniaApp.csproj') -c Release -r $rid -o $out
 if ($LASTEXITCODE -ne 0) { throw "빌드 실패(dotnet publish $LASTEXITCODE)" }
 
